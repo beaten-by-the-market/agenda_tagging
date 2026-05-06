@@ -6,309 +6,98 @@
   <title>HWPX 안건 태깅 시스템</title>
   <style>
     :root {
-      --bg: #f4f6f8;
-      --panel: #ffffff;
-      --ink: #172033;
-      --muted: #667085;
-      --line: #d9dee7;
-      --soft: #eef2f7;
-      --brand: #1266d6;
-      --brand-dark: #0b4ba7;
-      --ok: #087443;
-      --warn: #9a5b00;
-      --tag: #fff2a8;
-      --tag-line: #e2bd30;
-      --shadow: 0 10px 26px rgba(20, 35, 60, 0.09);
+      --bg: #f4f6f8; --panel: #ffffff; --ink: #172033; --muted: #667085;
+      --line: #d9dee7; --soft: #eef2f7; --brand: #1266d6; --brand-dark: #0b4ba7;
+      --ok: #087443; --warn: #9a5b00; --tag: #fff2a8; --tag-line: #e2bd30;
+      --shadow: 0 10px 26px rgba(20,35,60,.09);
     }
-
     * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      min-height: 100vh;
-      background: var(--bg);
-      color: var(--ink);
-      font-family: "Segoe UI", "Malgun Gothic", Arial, sans-serif;
-      letter-spacing: 0;
-    }
+    body { margin:0; min-height:100vh; background:var(--bg); color:var(--ink);
+      font-family:"Segoe UI","Malgun Gothic",Arial,sans-serif; }
 
-    .topbar {
-      height: 58px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      padding: 0 20px;
-      background: #111827;
-      color: #fff;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-    }
-
-    .brand {
-      display: flex;
-      align-items: baseline;
-      gap: 12px;
-      min-width: 0;
-    }
-
-    .brand strong {
-      font-size: 17px;
-      font-weight: 800;
-      white-space: nowrap;
-    }
-
-    .brand span {
-      color: #b9c2d1;
-      font-size: 12px;
-      white-space: nowrap;
-    }
-
-    .actions {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      min-width: 0;
-    }
+    .topbar { height:58px; display:flex; align-items:center; justify-content:space-between;
+      gap:16px; padding:0 20px; background:#111827; color:#fff;
+      border-bottom:1px solid rgba(255,255,255,.08); }
+    .brand { display:flex; align-items:baseline; gap:12px; min-width:0; }
+    .brand strong { font-size:17px; font-weight:800; white-space:nowrap; }
+    .brand span { color:#b9c2d1; font-size:12px; white-space:nowrap; }
+    .actions { display:flex; align-items:center; gap:8px; min-width:0; }
 
     button, .file-btn {
-      border: 1px solid transparent;
-      border-radius: 6px;
-      padding: 8px 11px;
-      background: var(--brand);
-      color: #fff;
-      font: inherit;
-      font-weight: 700;
-      font-size: 13px;
-      cursor: pointer;
-      transition: background .15s ease, border-color .15s ease, transform .15s ease;
-      white-space: nowrap;
+      border:1px solid transparent; border-radius:6px; padding:8px 11px;
+      background:var(--brand); color:#fff; font:inherit; font-weight:700;
+      font-size:13px; cursor:pointer;
+      transition:background .15s ease,transform .15s ease; white-space:nowrap;
     }
+    button:hover, .file-btn:hover { background:var(--brand-dark); }
+    button:active, .file-btn:active { transform:translateY(1px); }
+    button.secondary { background:#fff; color:#202938; border-color:var(--line); }
+    button.secondary:hover { background:var(--soft); }
+    button.success { background:#087443; }
+    button.success:hover { background:#065c35; }
+    input[type=file] { display:none; }
 
-    button:hover, .file-btn:hover { background: var(--brand-dark); }
-    button:active, .file-btn:active { transform: translateY(1px); }
-    button.secondary {
-      background: #fff;
-      color: #202938;
-      border-color: var(--line);
-    }
-    button.secondary:hover { background: var(--soft); }
-    input[type=file] { display: none; }
+    .status { height:34px; display:flex; align-items:center; gap:10px; padding:0 20px;
+      background:#fff; border-bottom:1px solid var(--line); color:var(--muted); font-size:13px; }
+    .dot { width:8px; height:8px; border-radius:50%; background:#a9b2c1; flex:0 0 auto; }
+    .dot.ready { background:var(--ok); }
+    .dot.busy  { background:var(--warn); }
 
-    .status {
-      height: 34px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 0 20px;
-      background: #fff;
-      border-bottom: 1px solid var(--line);
-      color: var(--muted);
-      font-size: 13px;
-    }
+    .layout { height:calc(100vh - 92px); display:grid;
+      grid-template-columns:minmax(320px,390px) minmax(0,1fr); gap:14px; padding:14px; }
+    .pane { min-height:0; background:var(--panel); border:1px solid var(--line);
+      box-shadow:var(--shadow); overflow:hidden; display:flex; flex-direction:column; }
+    .pane-head { height:50px; flex:0 0 auto; display:flex; align-items:center;
+      justify-content:space-between; padding:0 14px;
+      border-bottom:1px solid var(--line); background:#fbfcfe; }
+    .pane-title { font-size:14px; font-weight:800; }
+    .counter { color:var(--muted); font-size:12px; font-weight:700; }
 
-    .dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #a9b2c1;
-      flex: 0 0 auto;
-    }
+    .tag-list { min-height:0; overflow:auto; padding:12px; }
+    .tag-item { border:1px solid var(--line); border-radius:8px; background:#fff;
+      margin-bottom:10px; overflow:hidden; }
+    .tag-item.active { border-color:var(--brand); box-shadow:0 0 0 2px rgba(18,102,214,.12); }
+    .tag-top { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:8px;
+      align-items:center; padding:11px 12px; border-bottom:1px solid var(--soft); }
+    .tag-name { font-weight:800; font-size:14px; overflow-wrap:anywhere; }
+    .tag-select { padding:6px 9px; font-size:12px; }
+    .tag-value { min-height:42px; padding:10px 12px; color:var(--muted);
+      font-size:13px; line-height:1.5; overflow-wrap:anywhere; }
+    .tag-value.filled { color:var(--ink); background:#fbfffd; border-left:4px solid var(--ok); }
 
-    .dot.ready { background: var(--ok); }
-    .dot.busy { background: var(--warn); }
+    .viewer-shell { min-height:0; overflow:auto; background:#dfe4ec; padding:22px; }
+    .doc { width:min(920px,100%); min-height:calc(100vh - 170px); margin:0 auto;
+      background:#fff; border:1px solid #ccd3df;
+      box-shadow:0 20px 45px rgba(35,48,75,.14); padding:44px 50px; }
+    .drop { min-height:calc(100vh - 170px); display:grid; place-items:center;
+      text-align:center; color:var(--muted); border:2px dashed #b8c2d2;
+      background:#f8fafc; padding:24px; }
+    .drop strong { display:block; margin-bottom:8px; color:var(--ink); font-size:18px; }
 
-    .layout {
-      height: calc(100vh - 92px);
-      display: grid;
-      grid-template-columns: minmax(320px, 390px) minmax(0, 1fr);
-      gap: 14px;
-      padding: 14px;
-    }
+    .p { min-height:21px; margin:0 0 4px; white-space:pre-wrap;
+      line-height:1.6; font-size:10pt; cursor:default; }
+    .p:hover, .hcell:hover { background:#f4f8ff; }
 
-    .pane {
-      min-height: 0;
-      background: var(--panel);
-      border: 1px solid var(--line);
-      box-shadow: var(--shadow);
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-    }
+    .htable { width:100%; border-collapse:collapse; table-layout:fixed;
+      margin:10px 0 16px; font-size:13px; }
+    .htable td { border:1px solid #657083; padding:6px 7px; vertical-align:middle;
+      line-height:1.45; overflow-wrap:anywhere; white-space:pre-wrap; }
+    .hcell { cursor:default; }
 
-    .pane-head {
-      height: 50px;
-      flex: 0 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 14px;
-      border-bottom: 1px solid var(--line);
-      background: #fbfcfe;
-    }
+    .selected-fragment { background:var(--tag); box-shadow:inset 0 -2px 0 var(--tag-line);
+      border-radius:2px; padding:0 1px; }
 
-    .pane-title {
-      font-size: 14px;
-      font-weight: 800;
-    }
+    .hint { display:none; align-items:center; gap:8px; padding:9px 12px;
+      border-bottom:1px solid #f0d28c; background:#fff8df;
+      color:#694a00; font-size:13px; font-weight:700; }
+    .hint.on { display:flex; }
 
-    .counter {
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 700;
-    }
-
-    .tag-list {
-      min-height: 0;
-      overflow: auto;
-      padding: 12px;
-    }
-
-    .tag-item {
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: #fff;
-      margin-bottom: 10px;
-      overflow: hidden;
-    }
-
-    .tag-item.active {
-      border-color: var(--brand);
-      box-shadow: 0 0 0 2px rgba(18,102,214,.12);
-    }
-
-    .tag-top {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: 8px;
-      align-items: center;
-      padding: 11px 12px;
-      border-bottom: 1px solid var(--soft);
-    }
-
-    .tag-name {
-      font-weight: 800;
-      font-size: 14px;
-      overflow-wrap: anywhere;
-    }
-
-    .tag-select {
-      padding: 6px 9px;
-      font-size: 12px;
-    }
-
-    .tag-value {
-      min-height: 42px;
-      padding: 10px 12px;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.5;
-      overflow-wrap: anywhere;
-    }
-
-    .tag-value.filled {
-      color: var(--ink);
-      background: #fbfffd;
-      border-left: 4px solid var(--ok);
-    }
-
-    .viewer-shell {
-      min-height: 0;
-      overflow: auto;
-      background: #dfe4ec;
-      padding: 22px;
-    }
-
-    .doc {
-      width: min(920px, 100%);
-      min-height: calc(100vh - 170px);
-      margin: 0 auto;
-      background: #fff;
-      border: 1px solid #ccd3df;
-      box-shadow: 0 20px 45px rgba(35, 48, 75, .14);
-      padding: 44px 50px;
-    }
-
-    .drop {
-      min-height: calc(100vh - 170px);
-      display: grid;
-      place-items: center;
-      text-align: center;
-      color: var(--muted);
-      border: 2px dashed #b8c2d2;
-      background: #f8fafc;
-      padding: 24px;
-    }
-
-    .drop strong {
-      display: block;
-      margin-bottom: 8px;
-      color: var(--ink);
-      font-size: 18px;
-    }
-
-    .p {
-      min-height: 21px;
-      margin: 0 0 8px;
-      white-space: pre-wrap;
-      line-height: 1.72;
-      font-size: 15px;
-      cursor: default;
-    }
-
-    .p:hover, .hcell:hover { background: #f4f8ff; }
-
-    .htable {
-      width: 100%;
-      border-collapse: collapse;
-      table-layout: fixed;
-      margin: 10px 0 16px;
-      font-size: 13px;
-    }
-
-    .htable td {
-      border: 1px solid #657083;
-      padding: 6px 7px;
-      min-height: 28px;
-      vertical-align: middle;
-      line-height: 1.45;
-      overflow-wrap: anywhere;
-      white-space: pre-wrap;
-    }
-
-    .hcell {
-      cursor: default;
-    }
-
-    .selected-fragment {
-      background: var(--tag);
-      box-shadow: inset 0 -2px 0 var(--tag-line);
-      border-radius: 2px;
-      padding: 0 1px;
-    }
-
-    .hint {
-      display: none;
-      align-items: center;
-      gap: 8px;
-      padding: 9px 12px;
-      border-bottom: 1px solid #f0d28c;
-      background: #fff8df;
-      color: #694a00;
-      font-size: 13px;
-      font-weight: 700;
-    }
-
-    .hint.on { display: flex; }
-
-    @media (max-width: 900px) {
-      .layout {
-        height: auto;
-        min-height: calc(100vh - 92px);
-        grid-template-columns: 1fr;
-      }
-      .pane { min-height: 420px; }
-      .doc { padding: 28px 22px; }
-      .topbar { align-items: flex-start; height: auto; padding: 12px; flex-direction: column; }
-      .actions { width: 100%; overflow-x: auto; }
+    @media (max-width:900px) {
+      .layout { height:auto; min-height:calc(100vh - 92px); grid-template-columns:1fr; }
+      .pane { min-height:420px; }
+      .doc { padding:28px 22px; }
+      .topbar { align-items:flex-start; height:auto; padding:12px; flex-direction:column; }
+      .actions { width:100%; overflow-x:auto; }
     }
   </style>
 </head>
@@ -322,7 +111,8 @@
       <label class="file-btn" for="hwpx-file">HWPX 열기</label>
       <input id="hwpx-file" type="file" accept=".hwpx,.HWPX">
       <button class="secondary" id="clear-btn" type="button">초기화</button>
-      <button id="export-btn" type="button">JSON 내보내기</button>
+      <button id="export-json-btn" type="button">JSON 내보내기</button>
+      <button id="export-hwpx-btn" class="success" type="button">HWPX 저장</button>
     </div>
   </header>
 
@@ -359,336 +149,916 @@
     </section>
   </main>
 
-  <script>
-    const TAGS = [
-      { id: 'companyName', label: '기업명' },
-      { id: 'eventDate', label: '사유발생일' },
-      { id: 'noticeDate', label: '지정예고일' },
-      { id: 'motiveReview', label: '위반의 동기에 관한 검토' },
-      { id: 'materialityReview', label: '위반의 중요성에 대한 검토' },
-      { id: 'mitigationReview', label: '정상참작 사유 관련 검토' },
-    ];
+<script>
+/* =============================================================
+   태그 정의
+============================================================= */
+const TAGS = [
+  { id: 'companyName',       label: '기업명' },
+  { id: 'eventDate',         label: '사유발생일' },
+  { id: 'noticeDate',        label: '지정예고일' },
+  { id: 'motiveReview',      label: '위반의 동기에 관한 검토' },
+  { id: 'materialityReview', label: '위반의 중요성에 대한 검토' },
+  { id: 'mitigationReview',  label: '정상참작 사유 관련 검토' },
+];
 
-    const state = {
-      activeId: null,
-      values: Object.fromEntries(TAGS.map(tag => [tag.id, ''])),
-      fileName: '',
-    };
+/* =============================================================
+   전역 상태
+============================================================= */
+const state = {
+  activeId:     null,
+  values:       Object.fromEntries(TAGS.map(t => [t.id, ''])),
+  tagLocations: {},   // tagId -> { xmlIdx: number, text: string }
+  fileName:     '',
+  rawEntries:   {},   // name -> { data, compressed, method, crc32, compressedSize, uncompressedSize }
+  xmlSections:  [],   // [{ name, doc }]
+  xmlNodeMap:   [],   // [{ type:'p'|'tc', node: XMLElement, sectionIdx: number }]
+};
 
-    const $ = (id) => document.getElementById(id);
+let gStyles = { charShapes: new Map(), parShapes: new Map() };
 
-    function setStatus(text, tone = '') {
-      $('status-text').textContent = text;
-      $('status-dot').className = 'dot' + (tone ? ' ' + tone : '');
+/* =============================================================
+   기본 유틸리티
+============================================================= */
+const $ = id => document.getElementById(id);
+
+function setStatus(text, tone) {
+  $('status-text').textContent = text;
+  $('status-dot').className = 'dot' + (tone ? ' ' + tone : '');
+}
+
+function escapeHtml(v) {
+  return String(v ?? '')
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function normalizeText(v) {
+  // \u0000 = null byte
+  return String(v ?? '').replace(/\u0000/g,'').replace(/[ \t]+/g,' ').trim();
+}
+
+/* =============================================================
+   CRC-32 (오프라인 순수 JS)
+============================================================= */
+const CRC_TABLE = (() => {
+  const t = new Uint32Array(256);
+  for (let i = 0; i < 256; i++) {
+    let c = i;
+    for (let j = 0; j < 8; j++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+    t[i] = c;
+  }
+  return t;
+})();
+
+function crc32(bytes) {
+  let crc = 0xFFFFFFFF;
+  for (const b of bytes) crc = CRC_TABLE[(crc ^ b) & 0xFF] ^ (crc >>> 8);
+  return (crc ^ 0xFFFFFFFF) >>> 0;
+}
+
+/* =============================================================
+   ZIP 리더 (압축 원본 바이트 + 메타데이터 함께 보존)
+============================================================= */
+function findEOCD(bytes) {
+  for (let i = bytes.length - 22; i >= 0; i--) {
+    if (bytes[i]===0x50 && bytes[i+1]===0x4b && bytes[i+2]===0x05 && bytes[i+3]===0x06) return i;
+  }
+  throw new Error('ZIP 중앙 디렉터리를 찾을 수 없습니다.');
+}
+const u16 = (b,o) => b[o] | (b[o+1] << 8);
+const u32 = (b,o) => (b[o] | (b[o+1]<<8) | (b[o+2]<<16) | (b[o+3]<<24)) >>> 0;
+
+async function inflateRaw(bytes) {
+  if (!('DecompressionStream' in window))
+    throw new Error('이 브라우저는 HWPX 압축 해제를 지원하지 않습니다. 최신 Chrome/Edge를 사용해 주세요.');
+  const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+  return new Uint8Array(await new Response(stream).arrayBuffer());
+}
+
+async function unzipHwpx(file) {
+  const bytes   = new Uint8Array(await file.arrayBuffer());
+  const decoder = new TextDecoder('utf-8');
+  const eocd    = findEOCD(bytes);
+  const count   = u16(bytes, eocd + 10);
+  const cdOff   = u32(bytes, eocd + 16);
+  const entries = {};
+  let pos = cdOff;
+
+  for (let i = 0; i < count; i++) {
+    if (u32(bytes, pos) !== 0x02014b50) throw new Error('ZIP 항목 정보를 읽을 수 없습니다.');
+    const method           = u16(bytes, pos + 10);
+    const entryCrc         = u32(bytes, pos + 16);
+    const compressedSize   = u32(bytes, pos + 20);
+    const uncompressedSize = u32(bytes, pos + 24);
+    const nameLen          = u16(bytes, pos + 28);
+    const extraLen         = u16(bytes, pos + 30);
+    const commentLen       = u16(bytes, pos + 32);
+    const localOff         = u32(bytes, pos + 42);
+    const name = decoder.decode(bytes.slice(pos + 46, pos + 46 + nameLen));
+
+    const localNameLen  = u16(bytes, localOff + 26);
+    const localExtraLen = u16(bytes, localOff + 28);
+    const dataStart = localOff + 30 + localNameLen + localExtraLen;
+    const compressed = bytes.slice(dataStart, dataStart + compressedSize);
+
+    let data;
+    if      (method === 0) data = compressed;
+    else if (method === 8) data = await inflateRaw(compressed);
+    else throw new Error(`지원하지 않는 ZIP 압축 방식: ${method}`);
+
+    entries[name] = { data, compressed, method, crc32: entryCrc, compressedSize, uncompressedSize };
+    pos += 46 + nameLen + extraLen + commentLen;
+  }
+  return entries;
+}
+
+/* =============================================================
+   ZIP 라이터 (오프라인 순수 JS — CDN 불필요)
+============================================================= */
+async function buildZip(entries) {
+  // entries: [{ name, data?: Uint8Array, original?: entryMeta, modified: boolean }]
+  const enc = new TextEncoder();
+  const localParts = [];
+  const centralDir = [];
+  let offset = 0;
+
+  for (const entry of entries) {
+    const nameBytes = enc.encode(entry.name);
+    let method, compData, compSize, rawCrc, rawSize;
+
+    if (entry.original && !entry.modified) {
+      // 수정 안 된 엔트리: 원본 압축 바이트 재사용
+      method   = entry.original.method;
+      compData = entry.original.compressed;
+      compSize = entry.original.compressedSize;
+      rawCrc   = entry.original.crc32;
+      rawSize  = entry.original.uncompressedSize;
+    } else {
+      // 수정된 엔트리: CRC 계산 후 압축 시도
+      const raw = entry.data;
+      rawSize = raw.length;
+      rawCrc  = crc32(raw);
+
+      let compressed = null;
+      if (raw.length > 0 && 'CompressionStream' in window) {
+        try {
+          const cs = new CompressionStream('deflate-raw');
+          const w  = cs.writable.getWriter();
+          w.write(raw); w.close();
+          compressed = new Uint8Array(await new Response(cs.readable).arrayBuffer());
+        } catch { compressed = null; }
+      }
+
+      if (compressed && compressed.length < raw.length) {
+        method = 8; compData = compressed; compSize = compressed.length;
+      } else {
+        method = 0; compData = raw; compSize = raw.length;
+      }
     }
 
-    function escapeHtml(value) {
-      return String(value ?? '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
-    }
+    // Local file header
+    const lfh = new Uint8Array(30 + nameBytes.length);
+    const lv  = new DataView(lfh.buffer);
+    lv.setUint32(0,  0x04034b50, true);
+    lv.setUint16(4,  method === 8 ? 20 : 10, true);
+    lv.setUint16(6,  0, true);
+    lv.setUint16(8,  method, true);
+    lv.setUint16(10, 0, true); lv.setUint16(12, 0, true);
+    lv.setUint32(14, rawCrc,   true);
+    lv.setUint32(18, compSize, true);
+    lv.setUint32(22, rawSize,  true);
+    lv.setUint16(26, nameBytes.length, true);
+    lv.setUint16(28, 0, true);
+    lfh.set(nameBytes, 30);
+    localParts.push(lfh, compData);
 
-    function normalizeText(value) {
-      return String(value ?? '').replace(/\u0000/g, '').replace(/[ \t]+/g, ' ').trim();
-    }
+    // Central directory entry
+    const cde = new Uint8Array(46 + nameBytes.length);
+    const cv  = new DataView(cde.buffer);
+    cv.setUint32(0,  0x02014b50, true);
+    cv.setUint16(4,  20, true);
+    cv.setUint16(6,  method === 8 ? 20 : 10, true);
+    cv.setUint16(8,  0, true);
+    cv.setUint16(10, method, true);
+    cv.setUint16(12, 0, true); cv.setUint16(14, 0, true);
+    cv.setUint32(16, rawCrc,   true);
+    cv.setUint32(20, compSize, true);
+    cv.setUint32(24, rawSize,  true);
+    cv.setUint16(28, nameBytes.length, true);
+    cv.setUint16(30, 0, true); cv.setUint16(32, 0, true);
+    cv.setUint16(34, 0, true); cv.setUint16(36, 0, true);
+    cv.setUint32(38, 0, true);
+    cv.setUint32(42, offset, true);
+    cde.set(nameBytes, 46);
+    centralDir.push(cde);
 
-    function renderTags() {
-      $('tag-list').innerHTML = TAGS.map(tag => {
-        const value = state.values[tag.id];
-        return `
-          <article class="tag-item ${state.activeId === tag.id ? 'active' : ''}">
-            <div class="tag-top">
-              <div class="tag-name">${escapeHtml(tag.label)}</div>
-              <button class="tag-select" type="button" data-pick="${tag.id}">
-                ${state.activeId === tag.id ? '선택 중' : '선택'}
-              </button>
-            </div>
-            <div class="tag-value ${value ? 'filled' : ''}">
-              ${value ? escapeHtml(value) : '아직 태그된 텍스트가 없습니다.'}
-            </div>
-          </article>
-        `;
-      }).join('');
+    offset += lfh.length + compData.length;
+  }
 
-      $('tag-list').querySelectorAll('[data-pick]').forEach(btn => {
-        btn.addEventListener('click', () => activateTag(btn.dataset.pick));
-      });
+  // End of central directory
+  const cdSize = centralDir.reduce((s, e) => s + e.length, 0);
+  const eocd   = new Uint8Array(22);
+  const ev     = new DataView(eocd.buffer);
+  ev.setUint32(0,  0x06054b50, true);
+  ev.setUint16(4,  0, true); ev.setUint16(6, 0, true);
+  ev.setUint16(8,  entries.length, true);
+  ev.setUint16(10, entries.length, true);
+  ev.setUint32(12, cdSize, true);
+  ev.setUint32(16, offset, true);
+  ev.setUint16(20, 0, true);
 
-      const filled = Object.values(state.values).filter(Boolean).length;
-      $('tag-count').textContent = `${filled} / ${TAGS.length}`;
-    }
+  const all   = [...localParts, ...centralDir, eocd];
+  const total = all.reduce((s, p) => s + p.length, 0);
+  const out   = new Uint8Array(total);
+  let p = 0;
+  for (const chunk of all) { out.set(chunk, p); p += chunk.length; }
+  return out;
+}
 
-    function activateTag(id) {
-      state.activeId = state.activeId === id ? null : id;
-      $('hint').classList.toggle('on', Boolean(state.activeId));
-      renderTags();
-    }
+/* =============================================================
+   XML 노드 경로 유틸리티
+============================================================= */
+function getNodePath(node) {
+  const path = [];
+  let cur = node;
+  while (cur.parentNode && cur.parentNode.nodeType === Node.ELEMENT_NODE) {
+    const idx = Array.from(cur.parentNode.children).indexOf(cur);
+    path.unshift(idx);
+    cur = cur.parentNode;
+  }
+  return path;
+}
 
-    function setTaggedValue(value) {
-      const text = normalizeText(value);
-      if (!state.activeId || !text) return;
-      state.values[state.activeId] = text;
-      state.activeId = null;
-      $('hint').classList.remove('on');
-      renderTags();
-      setStatus('태그값을 저장했습니다.', 'ready');
-    }
+function getNodeAtPath(root, path) {
+  let cur = root;
+  for (const idx of path) {
+    cur = Array.from(cur.children)[idx];
+    if (!cur) return null;
+  }
+  return cur;
+}
 
-    function localName(node) {
-      return node.localName || node.nodeName.split(':').pop();
-    }
+/* =============================================================
+   XML 헬퍼
+============================================================= */
+function localName(node) {
+  return node.localName || node.nodeName.split(':').pop();
+}
+function directChildren(el, name) {
+  return Array.from(el.children).filter(c => localName(c) === name);
+}
+function descendants(el, name) {
+  return Array.from(el.getElementsByTagName('*')).filter(c => localName(c) === name);
+}
+function textFromNode(el) {
+  const parts = [];
+  function walk(node) {
+    if (node.nodeType === Node.TEXT_NODE) { parts.push(node.nodeValue); return; }
+    if (node.nodeType !== Node.ELEMENT_NODE) return;
+    const n = localName(node);
+    if (n === 'tbl') return;
+    if (n === 'lineBreak') parts.push('\n');
+    if (n === 't') { parts.push(node.textContent || ''); return; }
+    Array.from(node.childNodes).forEach(walk);
+  }
+  walk(el);
+  return normalizeText(parts.join(''));
+}
 
-    function directChildren(el, name) {
-      return Array.from(el.children).filter(child => localName(child) === name);
-    }
-
-    function descendants(el, name) {
-      return Array.from(el.getElementsByTagName('*')).filter(child => localName(child) === name);
-    }
-
-    function textFromNode(el) {
-      const parts = [];
-      function walk(node) {
-        if (node.nodeType === Node.TEXT_NODE) {
-          parts.push(node.nodeValue);
-          return;
+/* =============================================================
+   스타일 파싱
+============================================================= */
+function parseStyles(headerDoc) {
+  const charShapes = new Map(), parShapes = new Map();
+  if (!headerDoc) return { charShapes, parShapes };
+  for (const el of headerDoc.getElementsByTagName('*')) {
+    const n = localName(el);
+    if (n === 'charShape') {
+      const id = el.getAttribute('id'); if (id == null) continue;
+      const shape = {};
+      for (const c of el.children) {
+        const cn = localName(c);
+        if (cn === 'height') shape.height = parseInt(c.textContent) || null;
+        else if (cn === 'prop') {
+          shape.bold      = c.getAttribute('bold')    === '1';
+          shape.italic    = c.getAttribute('italic')  === '1';
+          const ul = c.getAttribute('underline');
+          shape.underline = ul && ul !== '0' && ul !== 'NONE';
+          const st = c.getAttribute('strikeout');
+          shape.strikeout = st && st !== '0' && st !== 'NONE';
+        } else if (cn === 'textColor') {
+          shape.color = c.getAttribute('fore') || c.getAttribute('foreColor') || null;
         }
-        if (node.nodeType !== Node.ELEMENT_NODE) return;
-        const name = localName(node);
-        if (name === 'tbl') return;
-        if (name === 'lineBreak') parts.push('\n');
-        if (name === 't') {
-          parts.push(node.textContent || '');
-          return;
+      }
+      charShapes.set(String(id), shape);
+    }
+    if (n === 'parShape') {
+      const id = el.getAttribute('id'); if (id == null) continue;
+      const shape = {};
+      for (const c of el.children) {
+        const cn = localName(c);
+        if (cn === 'align') shape.align = c.textContent.trim().toUpperCase();
+        else if (cn === 'margin') {
+          shape.leftIndent = parseInt(c.getAttribute('left')   || '0') || 0;
+          shape.indent     = parseInt(c.getAttribute('indent') || '0') || 0;
+        } else if (cn === 'lineSpacing') {
+          shape.lineSpacingType = (c.getAttribute('type')  || 'RATIO').toUpperCase();
+          shape.lineSpacing     = parseInt(c.getAttribute('value') || '0') || 0;
         }
-        Array.from(node.childNodes).forEach(walk);
       }
-      walk(el);
-      return normalizeText(parts.join(''));
+      parShapes.set(String(id), shape);
+    }
+  }
+  return { charShapes, parShapes };
+}
+
+function charShapeToStyle(id) {
+  if (id == null) return '';
+  const s = gStyles.charShapes.get(String(id));
+  if (!s) return '';
+  const p = [];
+  if (s.height) { const pt = s.height / 100; if (pt >= 4 && pt <= 96) p.push(`font-size:${pt}pt`); }
+  if (s.bold)      p.push('font-weight:700');
+  if (s.italic)    p.push('font-style:italic');
+  const deco = [];
+  if (s.underline)  deco.push('underline');
+  if (s.strikeout)  deco.push('line-through');
+  if (deco.length)  p.push(`text-decoration:${deco.join(' ')}`);
+  if (s.color && s.color !== '000000' && s.color !== '') p.push(`color:#${s.color}`);
+  return p.join(';');
+}
+
+function parShapeToStyle(id) {
+  if (id == null) return '';
+  const s = gStyles.parShapes.get(String(id));
+  if (!s) return '';
+  const p = [];
+  const aMap = { CENTER:'center', RIGHT:'right', LEFT:'left',
+    JUSTIFY:'justify', BOTH:'justify', DISTRIBUTE:'justify' };
+  if (s.align && aMap[s.align]) p.push(`text-align:${aMap[s.align]}`);
+  if (s.leftIndent > 0) {
+    const px = Math.round(s.leftIndent / 75); if (px > 0) p.push(`padding-left:${px}px`);
+  }
+  if (s.indent !== 0 && s.indent != null) {
+    const px = Math.round(s.indent / 75); if (px !== 0) p.push(`text-indent:${px}px`);
+  }
+  if (s.lineSpacing > 0 && s.lineSpacingType === 'RATIO')
+    p.push(`line-height:${(s.lineSpacing/100).toFixed(2)}`);
+  return p.join(';');
+}
+
+/* =============================================================
+   렌더링 (xmlNodeMap 추적)
+============================================================= */
+function renderRun(run) {
+  const parts = [];
+  for (const c of run.childNodes) {
+    if (c.nodeType !== Node.ELEMENT_NODE) continue;
+    const cn = localName(c);
+    if (cn === 't') parts.push(escapeHtml(c.textContent || ''));
+    else if (cn === 'lineBreak') parts.push('<br>');
+  }
+  const html = parts.join('');
+  if (!html) return '';
+  const style = charShapeToStyle(run.getAttribute('charShapeId'));
+  return style ? `<span style="${style}">${html}</span>` : html;
+}
+
+function renderCellContent(tc) {
+  const pNodes = descendants(tc, 'p');
+  if (!pNodes.length) return escapeHtml(normalizeText(textFromNode(tc)));
+  return pNodes.map(p => {
+    const runs = Array.from(p.childNodes).filter(
+      c => c.nodeType === Node.ELEMENT_NODE && (localName(c) === 'run' || localName(c) === 'r')
+    );
+    if (!runs.length) {
+      const t = normalizeText(textFromNode(p));
+      return t ? escapeHtml(t) : '';
+    }
+    return runs.map(renderRun).join('');
+  }).filter(Boolean).join('<br>');
+}
+
+function attrInt(el, name, fallback) {
+  const v = Number.parseInt(el?.getAttribute(name) || '', 10);
+  return (Number.isFinite(v) && v > 0) ? v : (fallback ?? 1);
+}
+
+function renderTable(tbl, sectionIdx) {
+  const rows = directChildren(tbl, 'tr');
+  const html = rows.map(tr => {
+    const cells = directChildren(tr, 'tc').map(tc => {
+      const span    = directChildren(tc, 'cellSpan')[0];
+      const colSpan = attrInt(span, 'colSpan', 1);
+      const rowSpan = attrInt(span, 'rowSpan', 1);
+      const plain   = normalizeText(textFromNode(tc));
+      const cellHtml = renderCellContent(tc);
+
+      const xmlIdx = state.xmlNodeMap.length;
+      state.xmlNodeMap.push({ type: 'tc', node: tc, sectionIdx });
+
+      return `<td class="hcell" colspan="${colSpan}" rowspan="${rowSpan}" ` +
+             `data-xml-idx="${xmlIdx}" data-tag-text="${escapeHtml(plain)}">${cellHtml || '&nbsp;'}</td>`;
+    }).join('');
+    return `<tr>${cells}</tr>`;
+  }).join('');
+  return `<table class="htable"><tbody>${html}</tbody></table>`;
+}
+
+function renderParagraph(p, sectionIdx) {
+  const tables = descendants(p, 'tbl');
+  if (tables.length) return tables.map(tbl => renderTable(tbl, sectionIdx)).join('');
+
+  const runs = Array.from(p.childNodes).filter(
+    c => c.nodeType === Node.ELEMENT_NODE && (localName(c) === 'run' || localName(c) === 'r')
+  );
+
+  let bodyHtml, plain;
+  if (runs.length) {
+    bodyHtml = runs.map(renderRun).join('');
+    plain = normalizeText(runs.flatMap(run =>
+      Array.from(run.childNodes)
+        .filter(c => c.nodeType === Node.ELEMENT_NODE && localName(c) === 't')
+        .map(c => c.textContent || '')
+    ).join(''));
+  } else {
+    plain    = normalizeText(textFromNode(p));
+    bodyHtml = escapeHtml(plain);
+  }
+
+  if (!plain && !bodyHtml.includes('<br')) return '<p class="p">&nbsp;</p>';
+
+  const xmlIdx = state.xmlNodeMap.length;
+  state.xmlNodeMap.push({ type: 'p', node: p, sectionIdx });
+
+  const parStyle  = parShapeToStyle(p.getAttribute('parShapeId'));
+  const styleAttr = parStyle ? ` style="${parStyle}"` : '';
+  return `<p class="p"${styleAttr} data-xml-idx="${xmlIdx}" data-tag-text="${escapeHtml(plain)}">${bodyHtml || '&nbsp;'}</p>`;
+}
+
+function renderHwpx() {
+  state.xmlNodeMap = [];
+  const body = state.xmlSections.map(({ doc }, sectionIdx) => {
+    const root = doc.documentElement;
+    return directChildren(root, 'p').map(p => renderParagraph(p, sectionIdx)).join('');
+  }).join('');
+
+  $('viewer-shell').innerHTML = `<div class="doc" id="doc">${body ||
+    '<div class="drop"><strong>표시할 본문을 찾지 못했습니다</strong></div>'}</div>`;
+  bindDocumentPicking();
+}
+
+function bindDocumentPicking() {
+  const doc = $('doc');
+  if (!doc) return;
+
+  doc.addEventListener('click', event => {
+    if (!state.activeId) return;
+    const target = event.target.closest('[data-xml-idx]');
+    if (!target) return;
+    const xmlIdx = parseInt(target.dataset.xmlIdx ?? '-1');
+    setTaggedValue(target.dataset.tagText || target.textContent, xmlIdx);
+  });
+
+  doc.addEventListener('mouseup', () => {
+    if (!state.activeId) return;
+    const sel  = window.getSelection();
+    const text = normalizeText(sel?.toString() || '');
+    if (!text) return;
+
+    let xmlIdx = -1;
+    if (sel.rangeCount > 0) {
+      const range     = sel.getRangeAt(0);
+      const container = range.commonAncestorContainer;
+      const el  = container.nodeType === Node.TEXT_NODE ? container.parentElement : container;
+      const xmlEl = el?.closest('[data-xml-idx]');
+      if (xmlEl) xmlIdx = parseInt(xmlEl.dataset.xmlIdx ?? '-1');
     }
 
-    function attrInt(el, name, fallback = 1) {
-      const value = Number.parseInt(el?.getAttribute(name) || '', 10);
-      return Number.isFinite(value) && value > 0 ? value : fallback;
+    markSelection(sel);
+    setTaggedValue(text, xmlIdx);
+    sel.removeAllRanges();
+  });
+}
+
+function markSelection(sel) {
+  if (!sel || sel.rangeCount === 0) return;
+  const range = sel.getRangeAt(0);
+  const doc   = $('doc');
+  if (!doc || !doc.contains(range.commonAncestorContainer)) return;
+  try {
+    const span = document.createElement('span');
+    span.className = 'selected-fragment';
+    range.surroundContents(span);
+  } catch {
+    const span = document.createElement('span');
+    span.className = 'selected-fragment';
+    span.textContent = sel.toString();
+    range.deleteContents();
+    range.insertNode(span);
+  }
+}
+
+/* =============================================================
+   HWPX fieldBegin / fieldEnd 삽입 (OWPML 표준 필드)
+============================================================= */
+function insertFieldInParagraph(xmlDoc, pNode, taggedText, tagId, label, fieldId) {
+  // 직접 자식 run 요소와 텍스트 수집 (ctrl run 등 텍스트 없는 run 제외)
+  const runData = [];
+  for (const child of pNode.childNodes) {
+    if (child.nodeType !== Node.ELEMENT_NODE) continue;
+    const n = localName(child);
+    if (n !== 'run' && n !== 'r') continue;
+    let text = '';
+    for (const rc of child.childNodes) {
+      if (rc.nodeType === Node.ELEMENT_NODE && localName(rc) === 't')
+        text += rc.textContent || '';
+    }
+    runData.push({ run: child, text });
+  }
+  if (runData.length === 0) return false;
+
+  // 네임스페이스 / 접두사 판단
+  const ns     = pNode.namespaceURI || '';
+  let   prefix = pNode.prefix || '';
+  if (!prefix && pNode.nodeName.includes(':')) prefix = pNode.nodeName.split(':')[0];
+  const qn = tag => prefix ? `${prefix}:${tag}` : tag;
+  const mk = tag => xmlDoc.createElementNS(ns || null, qn(tag));
+
+  // run 안의 t 요소 텍스트 교체
+  function setRunText(runNode, newText) {
+    for (const c of runNode.childNodes) {
+      if (c.nodeType === Node.ELEMENT_NODE && localName(c) === 't') {
+        c.textContent = newText; return;
+      }
+    }
+  }
+
+  // fieldBegin ctrl run 생성
+  function makeBeginRun() {
+    const run  = mk('run');
+    const ctrl = mk('ctrl');
+    const fb   = mk('fieldBegin');
+    fb.setAttribute('id',       String(fieldId));
+    fb.setAttribute('type',     'PRIVATE_INFO');
+    fb.setAttribute('name',     tagId);
+    fb.setAttribute('editable', '0');
+    fb.setAttribute('dirty',    '0');
+    fb.setAttribute('zorder',   '-1');
+    fb.setAttribute('fieldid',  String(fieldId));
+    const mt = mk('metaTag');
+    mt.textContent = JSON.stringify({ schema: 'agenda-tagging/v1', tagId, label });
+    fb.appendChild(mt);
+    ctrl.appendChild(fb);
+    run.appendChild(ctrl);
+    return run;
+  }
+
+  // fieldEnd ctrl run 생성
+  function makeEndRun() {
+    const run  = mk('run');
+    const ctrl = mk('ctrl');
+    const fe   = mk('fieldEnd');
+    fe.setAttribute('beginIDRef', String(fieldId));
+    fe.setAttribute('fieldid',    String(fieldId));
+    ctrl.appendChild(fe);
+    run.appendChild(ctrl);
+    return run;
+  }
+
+  const fullText   = runData.map(r => r.text).join('');
+  const normFull   = normalizeText(fullText);
+  const normTagged = normalizeText(taggedText);
+
+  // ── Case 1: 전체 문단 일치 ──
+  if (normTagged === normFull) {
+    pNode.insertBefore(makeBeginRun(), runData[0].run);
+    pNode.insertBefore(makeEndRun(),   runData[runData.length - 1].run.nextSibling);
+    return true;
+  }
+
+  // ── Case 2: 완전한 run 조합 매칭 (run 경계와 정확히 일치) ──
+  for (let s = 0; s < runData.length; s++) {
+    for (let e = s; e < runData.length; e++) {
+      const combined = runData.slice(s, e + 1).map(r => r.text).join('');
+      if (normalizeText(combined) === normTagged) {
+        pNode.insertBefore(makeBeginRun(), runData[s].run);
+        pNode.insertBefore(makeEndRun(),   runData[e].run.nextSibling);
+        return true;
+      }
+    }
+  }
+
+  // ── Case 3: 문자 수준 매칭 + run 분할 ──
+  // 정규화 인덱스 → 원시 인덱스 매핑
+  const normToRaw = [];
+  let prevSpace = true; // trim 처리
+  for (let ri = 0; ri < fullText.length; ri++) {
+    const ch = fullText[ri];
+    if (ch === '\u0000') continue;
+    if (ch === ' ' || ch === '\t') {
+      if (!prevSpace) { normToRaw.push(ri); prevSpace = true; }
+    } else {
+      normToRaw.push(ri);
+      prevSpace = false;
+    }
+  }
+
+  const normStart = normFull.indexOf(normTagged);
+  if (normStart === -1) {
+    // 찾지 못한 경우: 전체 문단 래핑
+    pNode.insertBefore(makeBeginRun(), runData[0].run);
+    pNode.insertBefore(makeEndRun(),   runData[runData.length - 1].run.nextSibling);
+    return true;
+  }
+
+  const rawStart = normToRaw[normStart] ?? 0;
+  const rawEnd   = (normToRaw[normStart + normTagged.length - 1] ?? (fullText.length - 1)) + 1;
+
+  // rawStart/rawEnd → runIdx/charInRun
+  let cumPos = 0;
+  let si = 0, sc = 0;
+  let ei = runData.length - 1, ec = runData[ei].text.length;
+
+  for (let i = 0; i < runData.length; i++) {
+    const rs = cumPos, re = cumPos + runData[i].text.length;
+    if (rawStart >= rs && rawStart < re) { si = i; sc = rawStart - rs; }
+    if (rawEnd   >  rs && rawEnd   <= re) { ei = i; ec = rawEnd   - rs; }
+    cumPos = re;
+  }
+
+  const sRun = runData[si];
+  const eRun = runData[ei];
+
+  if (si === ei) {
+    // 동일 run 내 분할
+    const before = sRun.text.slice(0, sc);
+    const middle = sRun.text.slice(sc, ec);
+    const after  = sRun.text.slice(ec);
+    if (before) {
+      const br = sRun.run.cloneNode(true); setRunText(br, before);
+      pNode.insertBefore(br, sRun.run);
+    }
+    pNode.insertBefore(makeBeginRun(), sRun.run);
+    setRunText(sRun.run, middle);
+    pNode.insertBefore(makeEndRun(), sRun.run.nextSibling);
+    if (after) {
+      const ar = sRun.run.cloneNode(true); setRunText(ar, after);
+      pNode.insertBefore(ar, sRun.run.nextSibling);
+    }
+  } else {
+    // 시작 run 앞부분 분할
+    if (sc > 0) {
+      const br = sRun.run.cloneNode(true); setRunText(br, sRun.text.slice(0, sc));
+      pNode.insertBefore(br, sRun.run);
+      setRunText(sRun.run, sRun.text.slice(sc));
+    }
+    pNode.insertBefore(makeBeginRun(), sRun.run);
+
+    // 끝 run 뒷부분 분할
+    if (ec < eRun.text.length) {
+      setRunText(eRun.run, eRun.text.slice(0, ec));
+      const nextSib = eRun.run.nextSibling;
+      pNode.insertBefore(makeEndRun(), nextSib);
+      const ar = eRun.run.cloneNode(true); setRunText(ar, eRun.text.slice(ec));
+      pNode.insertBefore(ar, nextSib);
+    } else {
+      pNode.insertBefore(makeEndRun(), eRun.run.nextSibling);
+    }
+  }
+  return true;
+}
+
+/* =============================================================
+   HWPX 내보내기
+============================================================= */
+async function exportHwpx() {
+  if (!state.fileName || !Object.keys(state.rawEntries).length) {
+    setStatus('먼저 HWPX 파일을 열어주세요.'); return;
+  }
+  const toExport = TAGS.filter(t => {
+    const loc = state.tagLocations[t.id];
+    return loc && loc.xmlIdx >= 0;
+  });
+  if (toExport.length === 0) {
+    setStatus('HWPX에 삽입할 태그가 없습니다. (문단/셀 클릭 또는 드래그로 태깅하세요.)'); return;
+  }
+
+  setStatus('HWPX 필드 삽입 중...', 'busy');
+
+  try {
+    // 원본 xmlSections 보호: 직렬화→재파싱으로 독립 복사본 생성
+    const parser     = new DOMParser();
+    const serializer = new XMLSerializer();
+    const workSections = state.xmlSections.map(({ name, doc }) => ({
+      name,
+      doc: parser.parseFromString(serializer.serializeToString(doc), 'application/xml'),
+    }));
+
+    let fieldId = (Math.floor(Date.now() / 1000) % 0x7FFFFFFF) + 1;
+
+    for (const tag of toExport) {
+      const loc      = state.tagLocations[tag.id];
+      const nodeInfo = state.xmlNodeMap[loc.xmlIdx];
+      if (!nodeInfo) continue;
+
+      const { type, node, sectionIdx } = nodeInfo;
+      const workDoc  = workSections[sectionIdx].doc;
+
+      // 원본 노드 경로로 복사본 doc의 동등 노드 탐색
+      const path     = getNodePath(node);
+      const workNode = getNodeAtPath(workDoc.documentElement, path);
+      if (!workNode) { console.warn(`태그 ${tag.id}: 복사본 노드 탐색 실패`); continue; }
+
+      let inserted = false;
+      if (type === 'p') {
+        inserted = insertFieldInParagraph(workDoc, workNode, loc.text, tag.id, tag.label, fieldId);
+      } else if (type === 'tc') {
+        const pEls = Array.from(workNode.getElementsByTagName('*')).filter(e => localName(e) === 'p');
+        for (const p of pEls) {
+          inserted = insertFieldInParagraph(workDoc, p, loc.text, tag.id, tag.label, fieldId);
+          if (inserted) break;
+        }
+      }
+      if (inserted) fieldId++;
+      else console.warn(`태그 ${tag.id}: 텍스트 위치 탐색 실패 — "${loc.text}"`);
     }
 
-    function renderTable(tbl) {
-      const rows = directChildren(tbl, 'tr');
-      const html = rows.map(tr => {
-        const cells = directChildren(tr, 'tc').map(tc => {
-          const span = directChildren(tc, 'cellSpan')[0];
-          const colSpan = attrInt(span, 'colSpan', 1);
-          const rowSpan = attrInt(span, 'rowSpan', 1);
-          const paragraphs = descendants(tc, 'p');
-          const text = paragraphs.length
-            ? paragraphs.map(p => textFromNode(p)).filter(Boolean).join('\n')
-            : textFromNode(tc);
-          return `<td class="hcell" colspan="${colSpan}" rowspan="${rowSpan}" data-tag-text="${escapeHtml(text)}">${escapeHtml(text)}</td>`;
-        }).join('');
-        return `<tr>${cells}</tr>`;
-      }).join('');
-      return `<table class="htable"><tbody>${html}</tbody></table>`;
+    // 수정된 section XML → UTF-8 바이트
+    const encoder      = new TextEncoder();
+    const modifiedData = {};
+    for (const { name, doc } of workSections) {
+      modifiedData[name] = encoder.encode(serializer.serializeToString(doc));
     }
 
-    function renderParagraph(p) {
-      const tables = descendants(p, 'tbl');
-      if (tables.length) return tables.map(renderTable).join('');
-      const text = textFromNode(p);
-      if (!text) return '<p class="p">&nbsp;</p>';
-      return `<p class="p" data-tag-text="${escapeHtml(text)}">${escapeHtml(text)}</p>`;
-    }
-
-    function renderHwpx(xmlDocs) {
-      const body = xmlDocs.map(doc => {
-        const root = doc.documentElement;
-        return directChildren(root, 'p').map(renderParagraph).join('');
-      }).join('');
-
-      $('viewer-shell').innerHTML = `<div class="doc" id="doc">${body || '<div class="drop"><strong>표시할 본문을 찾지 못했습니다</strong></div>'}</div>`;
-      bindDocumentPicking();
-    }
-
-    function bindDocumentPicking() {
-      const doc = $('doc');
-      if (!doc) return;
-
-      doc.addEventListener('click', event => {
-        if (!state.activeId) return;
-        const target = event.target.closest('[data-tag-text]');
-        if (!target) return;
-        setTaggedValue(target.dataset.tagText || target.textContent);
-      });
-
-      doc.addEventListener('mouseup', () => {
-        if (!state.activeId) return;
-        const selection = window.getSelection();
-        const text = normalizeText(selection?.toString() || '');
-        if (!text) return;
-        markSelection(selection);
-        setTaggedValue(text);
-        selection.removeAllRanges();
-      });
-    }
-
-    function markSelection(selection) {
-      if (!selection || selection.rangeCount === 0) return;
-      const range = selection.getRangeAt(0);
-      const doc = $('doc');
-      if (!doc || !doc.contains(range.commonAncestorContainer)) return;
-      try {
-        const span = document.createElement('span');
-        span.className = 'selected-fragment';
-        range.surroundContents(span);
-      } catch {
-        const span = document.createElement('span');
-        span.className = 'selected-fragment';
-        span.textContent = selection.toString();
-        range.deleteContents();
-        range.insertNode(span);
+    // ZIP 엔트리 목록 구성 (수정된 section은 새 데이터, 나머지는 원본 압축 재사용)
+    const zipEntries = [];
+    for (const [name, meta] of Object.entries(state.rawEntries)) {
+      if (modifiedData[name]) {
+        zipEntries.push({ name, data: modifiedData[name], modified: true });
+      } else {
+        zipEntries.push({ name, original: meta, modified: false });
       }
     }
 
-    function findEndOfCentralDirectory(bytes) {
-      for (let i = bytes.length - 22; i >= 0; i--) {
-        if (bytes[i] === 0x50 && bytes[i + 1] === 0x4b && bytes[i + 2] === 0x05 && bytes[i + 3] === 0x06) return i;
-      }
-      throw new Error('ZIP 중앙 디렉터리를 찾을 수 없습니다.');
-    }
+    // ZIP 빌드 → 다운로드
+    const zipBytes = await buildZip(zipEntries);
+    const blob = new Blob([zipBytes], { type: 'application/octet-stream' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = state.fileName.replace(/\.hwpx$/i, '') + '_tagged.hwpx';
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
 
-    function u16(bytes, offset) {
-      return bytes[offset] | (bytes[offset + 1] << 8);
-    }
+    setStatus(`HWPX 저장 완료 — 필드 ${fieldId - 1}개 삽입됨`, 'ready');
+  } catch (err) {
+    console.error(err);
+    setStatus('HWPX 저장 중 오류: ' + err.message);
+  }
+}
 
-    function u32(bytes, offset) {
-      return (bytes[offset] | (bytes[offset + 1] << 8) | (bytes[offset + 2] << 16) | (bytes[offset + 3] << 24)) >>> 0;
-    }
+/* =============================================================
+   파일 로드
+============================================================= */
+async function loadHwpx(file) {
+  setStatus('HWPX 파일을 읽는 중입니다.', 'busy');
+  state.fileName = file.name;
+  $('doc-name').textContent = file.name;
 
-    async function inflateRaw(bytes) {
-      if (!('DecompressionStream' in window)) {
-        throw new Error('이 브라우저는 HWPX 압축 해제를 지원하지 않습니다. 최신 Chrome 또는 Edge를 사용해 주세요.');
-      }
-      const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
-      return new Uint8Array(await new Response(stream).arrayBuffer());
-    }
+  const entries = await unzipHwpx(file);
+  state.rawEntries = entries;
 
-    async function unzipHwpx(file) {
-      const bytes = new Uint8Array(await file.arrayBuffer());
-      const decoder = new TextDecoder('utf-8');
-      const eocd = findEndOfCentralDirectory(bytes);
-      const entryCount = u16(bytes, eocd + 10);
-      const cdOffset = u32(bytes, eocd + 16);
-      const entries = {};
-      let pos = cdOffset;
+  const decoder = new TextDecoder('utf-8');
+  const parser  = new DOMParser();
 
-      for (let i = 0; i < entryCount; i++) {
-        if (u32(bytes, pos) !== 0x02014b50) throw new Error('ZIP 항목 정보를 읽을 수 없습니다.');
-        const method = u16(bytes, pos + 10);
-        const compressedSize = u32(bytes, pos + 20);
-        const nameLen = u16(bytes, pos + 28);
-        const extraLen = u16(bytes, pos + 30);
-        const commentLen = u16(bytes, pos + 32);
-        const localOffset = u32(bytes, pos + 42);
-        const name = decoder.decode(bytes.slice(pos + 46, pos + 46 + nameLen));
-        const localNameLen = u16(bytes, localOffset + 26);
-        const localExtraLen = u16(bytes, localOffset + 28);
-        const dataStart = localOffset + 30 + localNameLen + localExtraLen;
-        const compressed = bytes.slice(dataStart, dataStart + compressedSize);
-        let data;
-        if (method === 0) data = compressed;
-        else if (method === 8) data = await inflateRaw(compressed);
-        else throw new Error(`지원하지 않는 ZIP 압축 방식입니다: ${method}`);
-        entries[name] = data;
-        pos += 46 + nameLen + extraLen + commentLen;
-      }
+  // header.xml 스타일 로드
+  gStyles = { charShapes: new Map(), parShapes: new Map() };
+  const headerKey = Object.keys(entries).find(n => /header\.xml$/i.test(n));
+  if (headerKey) {
+    try {
+      const hDoc = parser.parseFromString(decoder.decode(entries[headerKey].data), 'application/xml');
+      if (!hDoc.querySelector('parsererror')) gStyles = parseStyles(hDoc);
+    } catch { /* 스타일 없이 렌더링 */ }
+  }
 
-      return entries;
-    }
+  // section XML 로드
+  const sectionNames = Object.keys(entries)
+    .filter(n => /^Contents\/section\d+\.xml$/i.test(n))
+    .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+  if (!sectionNames.length) throw new Error('본문 section XML을 찾지 못했습니다.');
 
-    async function loadHwpx(file) {
-      setStatus('HWPX 파일을 읽는 중입니다.', 'busy');
-      state.fileName = file.name;
-      $('doc-name').textContent = file.name;
+  state.xmlSections = sectionNames.map(name => {
+    const doc = parser.parseFromString(decoder.decode(entries[name].data), 'application/xml');
+    if (doc.querySelector('parsererror')) throw new Error(`${name} XML 파싱에 실패했습니다.`);
+    return { name, doc };
+  });
 
-      const entries = await unzipHwpx(file);
-      const sectionNames = Object.keys(entries)
-        .filter(name => /^Contents\/section\d+\.xml$/i.test(name))
-        .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
-      if (!sectionNames.length) throw new Error('본문 section XML을 찾지 못했습니다.');
+  renderHwpx();
+  setStatus(`${file.name} 렌더링 완료 (글자체 ${gStyles.charShapes.size}개 적용)`, 'ready');
+}
 
-      const decoder = new TextDecoder('utf-8');
-      const parser = new DOMParser();
-      const docs = sectionNames.map(name => {
-        const doc = parser.parseFromString(decoder.decode(entries[name]), 'application/xml');
-        if (doc.querySelector('parsererror')) throw new Error(`${name} XML 파싱에 실패했습니다.`);
-        return doc;
-      });
+async function handleFile(file) {
+  if (!file) return;
+  if (!/\.hwpx$/i.test(file.name)) { setStatus('HWPX 파일만 열 수 있습니다.'); return; }
+  try { await loadHwpx(file); }
+  catch (err) { console.error(err); setStatus(err.message || '파일을 읽는 중 오류가 발생했습니다.'); }
+}
 
-      renderHwpx(docs);
-      setStatus(`${file.name} 렌더링이 완료되었습니다.`, 'ready');
-    }
+/* =============================================================
+   태그 UI
+============================================================= */
+function renderTags() {
+  $('tag-list').innerHTML = TAGS.map(tag => {
+    const value = state.values[tag.id];
+    return `<article class="tag-item ${state.activeId === tag.id ? 'active' : ''}">
+      <div class="tag-top">
+        <div class="tag-name">${escapeHtml(tag.label)}</div>
+        <button class="tag-select" type="button" data-pick="${tag.id}">
+          ${state.activeId === tag.id ? '선택 중' : '선택'}
+        </button>
+      </div>
+      <div class="tag-value ${value ? 'filled' : ''}">
+        ${value ? escapeHtml(value) : '아직 태그된 텍스트가 없습니다.'}
+      </div>
+    </article>`;
+  }).join('');
 
-    async function handleFile(file) {
-      if (!file) return;
-      if (!/\.hwpx$/i.test(file.name)) {
-        setStatus('HWPX 파일만 열 수 있습니다.');
-        return;
-      }
-      try {
-        await loadHwpx(file);
-      } catch (err) {
-        console.error(err);
-        setStatus(err.message || '파일을 읽는 중 오류가 발생했습니다.');
-      }
-    }
+  $('tag-list').querySelectorAll('[data-pick]').forEach(btn => {
+    btn.addEventListener('click', () => activateTag(btn.dataset.pick));
+  });
 
-    function clearAll() {
-      state.activeId = null;
-      for (const tag of TAGS) state.values[tag.id] = '';
-      $('hint').classList.remove('on');
-      renderTags();
-      setStatus(state.fileName ? `${state.fileName} 태그값을 초기화했습니다.` : '태그값을 초기화했습니다.', state.fileName ? 'ready' : '');
-    }
+  const filled = Object.values(state.values).filter(Boolean).length;
+  $('tag-count').textContent = `${filled} / ${TAGS.length}`;
+}
 
-    function exportJson() {
-      const payload = {
-        fileName: state.fileName,
-        taggedAt: new Date().toISOString(),
-        tags: Object.fromEntries(TAGS.map(tag => [tag.label, state.values[tag.id] || null])),
-      };
-      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'agenda-tags.json';
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-    }
+function activateTag(id) {
+  state.activeId = state.activeId === id ? null : id;
+  $('hint').classList.toggle('on', Boolean(state.activeId));
+  renderTags();
+}
 
-    function initDropZone() {
-      const shell = $('viewer-shell');
-      shell.addEventListener('dragover', event => {
-        event.preventDefault();
-        shell.style.background = '#cfd8e6';
-      });
-      shell.addEventListener('dragleave', () => {
-        shell.style.background = '';
-      });
-      shell.addEventListener('drop', event => {
-        event.preventDefault();
-        shell.style.background = '';
-        handleFile(event.dataTransfer.files[0]);
-      });
-    }
+function setTaggedValue(value, xmlIdx) {
+  if (xmlIdx === undefined) xmlIdx = -1;
+  const text = normalizeText(value);
+  if (!state.activeId || !text) return;
+  state.values[state.activeId]       = text;
+  state.tagLocations[state.activeId] = { xmlIdx, text };
+  state.activeId = null;
+  $('hint').classList.remove('on');
+  renderTags();
+  setStatus('태그값을 저장했습니다.', 'ready');
+}
 
-    $('hwpx-file').addEventListener('change', event => handleFile(event.target.files[0]));
-    $('clear-btn').addEventListener('click', clearAll);
-    $('export-btn').addEventListener('click', exportJson);
-    initDropZone();
-    renderTags();
-  </script>
+/* =============================================================
+   초기화 / JSON 내보내기
+============================================================= */
+function clearAll() {
+  state.activeId     = null;
+  state.tagLocations = {};
+  for (const tag of TAGS) state.values[tag.id] = '';
+  $('hint').classList.remove('on');
+  renderTags();
+  setStatus(
+    state.fileName ? `${state.fileName} 태그값을 초기화했습니다.` : '태그값을 초기화했습니다.',
+    state.fileName ? 'ready' : ''
+  );
+}
+
+function exportJson() {
+  const payload = {
+    fileName: state.fileName,
+    taggedAt: new Date().toISOString(),
+    tags: Object.fromEntries(TAGS.map(tag => [tag.label, state.values[tag.id] || null])),
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json;charset=utf-8' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = 'agenda-tags.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+}
+
+/* =============================================================
+   드롭존 / 이벤트 바인딩
+============================================================= */
+function initDropZone() {
+  const shell = $('viewer-shell');
+  shell.addEventListener('dragover',  e => { e.preventDefault(); shell.style.background = '#cfd8e6'; });
+  shell.addEventListener('dragleave', ()  => { shell.style.background = ''; });
+  shell.addEventListener('drop', e => {
+    e.preventDefault(); shell.style.background = '';
+    handleFile(e.dataTransfer.files[0]);
+  });
+}
+
+$('hwpx-file').addEventListener('change', e => handleFile(e.target.files[0]));
+$('clear-btn').addEventListener('click', clearAll);
+$('export-json-btn').addEventListener('click', exportJson);
+$('export-hwpx-btn').addEventListener('click', exportHwpx);
+initDropZone();
+renderTags();
+</script>
 </body>
 </html>
