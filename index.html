@@ -1,0 +1,694 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HWPX 안건 태깅 시스템</title>
+  <style>
+    :root {
+      --bg: #f4f6f8;
+      --panel: #ffffff;
+      --ink: #172033;
+      --muted: #667085;
+      --line: #d9dee7;
+      --soft: #eef2f7;
+      --brand: #1266d6;
+      --brand-dark: #0b4ba7;
+      --ok: #087443;
+      --warn: #9a5b00;
+      --tag: #fff2a8;
+      --tag-line: #e2bd30;
+      --shadow: 0 10px 26px rgba(20, 35, 60, 0.09);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Segoe UI", "Malgun Gothic", Arial, sans-serif;
+      letter-spacing: 0;
+    }
+
+    .topbar {
+      height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 0 20px;
+      background: #111827;
+      color: #fff;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .brand {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .brand strong {
+      font-size: 17px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .brand span {
+      color: #b9c2d1;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    button, .file-btn {
+      border: 1px solid transparent;
+      border-radius: 6px;
+      padding: 8px 11px;
+      background: var(--brand);
+      color: #fff;
+      font: inherit;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      transition: background .15s ease, border-color .15s ease, transform .15s ease;
+      white-space: nowrap;
+    }
+
+    button:hover, .file-btn:hover { background: var(--brand-dark); }
+    button:active, .file-btn:active { transform: translateY(1px); }
+    button.secondary {
+      background: #fff;
+      color: #202938;
+      border-color: var(--line);
+    }
+    button.secondary:hover { background: var(--soft); }
+    input[type=file] { display: none; }
+
+    .status {
+      height: 34px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 20px;
+      background: #fff;
+      border-bottom: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #a9b2c1;
+      flex: 0 0 auto;
+    }
+
+    .dot.ready { background: var(--ok); }
+    .dot.busy { background: var(--warn); }
+
+    .layout {
+      height: calc(100vh - 92px);
+      display: grid;
+      grid-template-columns: minmax(320px, 390px) minmax(0, 1fr);
+      gap: 14px;
+      padding: 14px;
+    }
+
+    .pane {
+      min-height: 0;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .pane-head {
+      height: 50px;
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 14px;
+      border-bottom: 1px solid var(--line);
+      background: #fbfcfe;
+    }
+
+    .pane-title {
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .counter {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .tag-list {
+      min-height: 0;
+      overflow: auto;
+      padding: 12px;
+    }
+
+    .tag-item {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+
+    .tag-item.active {
+      border-color: var(--brand);
+      box-shadow: 0 0 0 2px rgba(18,102,214,.12);
+    }
+
+    .tag-top {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: center;
+      padding: 11px 12px;
+      border-bottom: 1px solid var(--soft);
+    }
+
+    .tag-name {
+      font-weight: 800;
+      font-size: 14px;
+      overflow-wrap: anywhere;
+    }
+
+    .tag-select {
+      padding: 6px 9px;
+      font-size: 12px;
+    }
+
+    .tag-value {
+      min-height: 42px;
+      padding: 10px 12px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+    }
+
+    .tag-value.filled {
+      color: var(--ink);
+      background: #fbfffd;
+      border-left: 4px solid var(--ok);
+    }
+
+    .viewer-shell {
+      min-height: 0;
+      overflow: auto;
+      background: #dfe4ec;
+      padding: 22px;
+    }
+
+    .doc {
+      width: min(920px, 100%);
+      min-height: calc(100vh - 170px);
+      margin: 0 auto;
+      background: #fff;
+      border: 1px solid #ccd3df;
+      box-shadow: 0 20px 45px rgba(35, 48, 75, .14);
+      padding: 44px 50px;
+    }
+
+    .drop {
+      min-height: calc(100vh - 170px);
+      display: grid;
+      place-items: center;
+      text-align: center;
+      color: var(--muted);
+      border: 2px dashed #b8c2d2;
+      background: #f8fafc;
+      padding: 24px;
+    }
+
+    .drop strong {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--ink);
+      font-size: 18px;
+    }
+
+    .p {
+      min-height: 21px;
+      margin: 0 0 8px;
+      white-space: pre-wrap;
+      line-height: 1.72;
+      font-size: 15px;
+      cursor: default;
+    }
+
+    .p:hover, .hcell:hover { background: #f4f8ff; }
+
+    .htable {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      margin: 10px 0 16px;
+      font-size: 13px;
+    }
+
+    .htable td {
+      border: 1px solid #657083;
+      padding: 6px 7px;
+      min-height: 28px;
+      vertical-align: middle;
+      line-height: 1.45;
+      overflow-wrap: anywhere;
+      white-space: pre-wrap;
+    }
+
+    .hcell {
+      cursor: default;
+    }
+
+    .selected-fragment {
+      background: var(--tag);
+      box-shadow: inset 0 -2px 0 var(--tag-line);
+      border-radius: 2px;
+      padding: 0 1px;
+    }
+
+    .hint {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 12px;
+      border-bottom: 1px solid #f0d28c;
+      background: #fff8df;
+      color: #694a00;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .hint.on { display: flex; }
+
+    @media (max-width: 900px) {
+      .layout {
+        height: auto;
+        min-height: calc(100vh - 92px);
+        grid-template-columns: 1fr;
+      }
+      .pane { min-height: 420px; }
+      .doc { padding: 28px 22px; }
+      .topbar { align-items: flex-start; height: auto; padding: 12px; flex-direction: column; }
+      .actions { width: 100%; overflow-x: auto; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <strong>HWPX 안건 태깅 시스템</strong>
+      <span>왼쪽 항목을 선택하고 오른쪽 원문에서 근거 텍스트를 지정합니다</span>
+    </div>
+    <div class="actions">
+      <label class="file-btn" for="hwpx-file">HWPX 열기</label>
+      <input id="hwpx-file" type="file" accept=".hwpx,.HWPX">
+      <button class="secondary" id="clear-btn" type="button">초기화</button>
+      <button id="export-btn" type="button">JSON 내보내기</button>
+    </div>
+  </header>
+
+  <div class="status">
+    <span class="dot" id="status-dot"></span>
+    <span id="status-text">HWPX 파일을 업로드해 주세요.</span>
+  </div>
+
+  <main class="layout">
+    <section class="pane">
+      <div class="pane-head">
+        <div class="pane-title">태그대상 항목</div>
+        <div class="counter" id="tag-count">0 / 6</div>
+      </div>
+      <div class="tag-list" id="tag-list"></div>
+    </section>
+
+    <section class="pane">
+      <div class="pane-head">
+        <div class="pane-title">HWPX 원문</div>
+        <div class="counter" id="doc-name">문서 없음</div>
+      </div>
+      <div class="hint" id="hint">활성 항목에 넣을 텍스트를 드래그하거나 문단/셀을 클릭하세요.</div>
+      <div class="viewer-shell" id="viewer-shell">
+        <div class="doc">
+          <div class="drop" id="drop-zone">
+            <div>
+              <strong>HWPX 파일을 여기에 놓거나 상단에서 열어주세요</strong>
+              <span>문단과 표를 읽어 오른쪽 원문 화면에 렌더링합니다.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const TAGS = [
+      { id: 'companyName', label: '기업명' },
+      { id: 'eventDate', label: '사유발생일' },
+      { id: 'noticeDate', label: '지정예고일' },
+      { id: 'motiveReview', label: '위반의 동기에 관한 검토' },
+      { id: 'materialityReview', label: '위반의 중요성에 대한 검토' },
+      { id: 'mitigationReview', label: '정상참작 사유 관련 검토' },
+    ];
+
+    const state = {
+      activeId: null,
+      values: Object.fromEntries(TAGS.map(tag => [tag.id, ''])),
+      fileName: '',
+    };
+
+    const $ = (id) => document.getElementById(id);
+
+    function setStatus(text, tone = '') {
+      $('status-text').textContent = text;
+      $('status-dot').className = 'dot' + (tone ? ' ' + tone : '');
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function normalizeText(value) {
+      return String(value ?? '').replace(/\u0000/g, '').replace(/[ \t]+/g, ' ').trim();
+    }
+
+    function renderTags() {
+      $('tag-list').innerHTML = TAGS.map(tag => {
+        const value = state.values[tag.id];
+        return `
+          <article class="tag-item ${state.activeId === tag.id ? 'active' : ''}">
+            <div class="tag-top">
+              <div class="tag-name">${escapeHtml(tag.label)}</div>
+              <button class="tag-select" type="button" data-pick="${tag.id}">
+                ${state.activeId === tag.id ? '선택 중' : '선택'}
+              </button>
+            </div>
+            <div class="tag-value ${value ? 'filled' : ''}">
+              ${value ? escapeHtml(value) : '아직 태그된 텍스트가 없습니다.'}
+            </div>
+          </article>
+        `;
+      }).join('');
+
+      $('tag-list').querySelectorAll('[data-pick]').forEach(btn => {
+        btn.addEventListener('click', () => activateTag(btn.dataset.pick));
+      });
+
+      const filled = Object.values(state.values).filter(Boolean).length;
+      $('tag-count').textContent = `${filled} / ${TAGS.length}`;
+    }
+
+    function activateTag(id) {
+      state.activeId = state.activeId === id ? null : id;
+      $('hint').classList.toggle('on', Boolean(state.activeId));
+      renderTags();
+    }
+
+    function setTaggedValue(value) {
+      const text = normalizeText(value);
+      if (!state.activeId || !text) return;
+      state.values[state.activeId] = text;
+      state.activeId = null;
+      $('hint').classList.remove('on');
+      renderTags();
+      setStatus('태그값을 저장했습니다.', 'ready');
+    }
+
+    function localName(node) {
+      return node.localName || node.nodeName.split(':').pop();
+    }
+
+    function directChildren(el, name) {
+      return Array.from(el.children).filter(child => localName(child) === name);
+    }
+
+    function descendants(el, name) {
+      return Array.from(el.getElementsByTagName('*')).filter(child => localName(child) === name);
+    }
+
+    function textFromNode(el) {
+      const parts = [];
+      function walk(node) {
+        if (node.nodeType === Node.TEXT_NODE) {
+          parts.push(node.nodeValue);
+          return;
+        }
+        if (node.nodeType !== Node.ELEMENT_NODE) return;
+        const name = localName(node);
+        if (name === 'tbl') return;
+        if (name === 'lineBreak') parts.push('\n');
+        if (name === 't') {
+          parts.push(node.textContent || '');
+          return;
+        }
+        Array.from(node.childNodes).forEach(walk);
+      }
+      walk(el);
+      return normalizeText(parts.join(''));
+    }
+
+    function attrInt(el, name, fallback = 1) {
+      const value = Number.parseInt(el?.getAttribute(name) || '', 10);
+      return Number.isFinite(value) && value > 0 ? value : fallback;
+    }
+
+    function renderTable(tbl) {
+      const rows = directChildren(tbl, 'tr');
+      const html = rows.map(tr => {
+        const cells = directChildren(tr, 'tc').map(tc => {
+          const span = directChildren(tc, 'cellSpan')[0];
+          const colSpan = attrInt(span, 'colSpan', 1);
+          const rowSpan = attrInt(span, 'rowSpan', 1);
+          const paragraphs = descendants(tc, 'p');
+          const text = paragraphs.length
+            ? paragraphs.map(p => textFromNode(p)).filter(Boolean).join('\n')
+            : textFromNode(tc);
+          return `<td class="hcell" colspan="${colSpan}" rowspan="${rowSpan}" data-tag-text="${escapeHtml(text)}">${escapeHtml(text)}</td>`;
+        }).join('');
+        return `<tr>${cells}</tr>`;
+      }).join('');
+      return `<table class="htable"><tbody>${html}</tbody></table>`;
+    }
+
+    function renderParagraph(p) {
+      const tables = descendants(p, 'tbl');
+      if (tables.length) return tables.map(renderTable).join('');
+      const text = textFromNode(p);
+      if (!text) return '<p class="p">&nbsp;</p>';
+      return `<p class="p" data-tag-text="${escapeHtml(text)}">${escapeHtml(text)}</p>`;
+    }
+
+    function renderHwpx(xmlDocs) {
+      const body = xmlDocs.map(doc => {
+        const root = doc.documentElement;
+        return directChildren(root, 'p').map(renderParagraph).join('');
+      }).join('');
+
+      $('viewer-shell').innerHTML = `<div class="doc" id="doc">${body || '<div class="drop"><strong>표시할 본문을 찾지 못했습니다</strong></div>'}</div>`;
+      bindDocumentPicking();
+    }
+
+    function bindDocumentPicking() {
+      const doc = $('doc');
+      if (!doc) return;
+
+      doc.addEventListener('click', event => {
+        if (!state.activeId) return;
+        const target = event.target.closest('[data-tag-text]');
+        if (!target) return;
+        setTaggedValue(target.dataset.tagText || target.textContent);
+      });
+
+      doc.addEventListener('mouseup', () => {
+        if (!state.activeId) return;
+        const selection = window.getSelection();
+        const text = normalizeText(selection?.toString() || '');
+        if (!text) return;
+        markSelection(selection);
+        setTaggedValue(text);
+        selection.removeAllRanges();
+      });
+    }
+
+    function markSelection(selection) {
+      if (!selection || selection.rangeCount === 0) return;
+      const range = selection.getRangeAt(0);
+      const doc = $('doc');
+      if (!doc || !doc.contains(range.commonAncestorContainer)) return;
+      try {
+        const span = document.createElement('span');
+        span.className = 'selected-fragment';
+        range.surroundContents(span);
+      } catch {
+        const span = document.createElement('span');
+        span.className = 'selected-fragment';
+        span.textContent = selection.toString();
+        range.deleteContents();
+        range.insertNode(span);
+      }
+    }
+
+    function findEndOfCentralDirectory(bytes) {
+      for (let i = bytes.length - 22; i >= 0; i--) {
+        if (bytes[i] === 0x50 && bytes[i + 1] === 0x4b && bytes[i + 2] === 0x05 && bytes[i + 3] === 0x06) return i;
+      }
+      throw new Error('ZIP 중앙 디렉터리를 찾을 수 없습니다.');
+    }
+
+    function u16(bytes, offset) {
+      return bytes[offset] | (bytes[offset + 1] << 8);
+    }
+
+    function u32(bytes, offset) {
+      return (bytes[offset] | (bytes[offset + 1] << 8) | (bytes[offset + 2] << 16) | (bytes[offset + 3] << 24)) >>> 0;
+    }
+
+    async function inflateRaw(bytes) {
+      if (!('DecompressionStream' in window)) {
+        throw new Error('이 브라우저는 HWPX 압축 해제를 지원하지 않습니다. 최신 Chrome 또는 Edge를 사용해 주세요.');
+      }
+      const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+      return new Uint8Array(await new Response(stream).arrayBuffer());
+    }
+
+    async function unzipHwpx(file) {
+      const bytes = new Uint8Array(await file.arrayBuffer());
+      const decoder = new TextDecoder('utf-8');
+      const eocd = findEndOfCentralDirectory(bytes);
+      const entryCount = u16(bytes, eocd + 10);
+      const cdOffset = u32(bytes, eocd + 16);
+      const entries = {};
+      let pos = cdOffset;
+
+      for (let i = 0; i < entryCount; i++) {
+        if (u32(bytes, pos) !== 0x02014b50) throw new Error('ZIP 항목 정보를 읽을 수 없습니다.');
+        const method = u16(bytes, pos + 10);
+        const compressedSize = u32(bytes, pos + 20);
+        const nameLen = u16(bytes, pos + 28);
+        const extraLen = u16(bytes, pos + 30);
+        const commentLen = u16(bytes, pos + 32);
+        const localOffset = u32(bytes, pos + 42);
+        const name = decoder.decode(bytes.slice(pos + 46, pos + 46 + nameLen));
+        const localNameLen = u16(bytes, localOffset + 26);
+        const localExtraLen = u16(bytes, localOffset + 28);
+        const dataStart = localOffset + 30 + localNameLen + localExtraLen;
+        const compressed = bytes.slice(dataStart, dataStart + compressedSize);
+        let data;
+        if (method === 0) data = compressed;
+        else if (method === 8) data = await inflateRaw(compressed);
+        else throw new Error(`지원하지 않는 ZIP 압축 방식입니다: ${method}`);
+        entries[name] = data;
+        pos += 46 + nameLen + extraLen + commentLen;
+      }
+
+      return entries;
+    }
+
+    async function loadHwpx(file) {
+      setStatus('HWPX 파일을 읽는 중입니다.', 'busy');
+      state.fileName = file.name;
+      $('doc-name').textContent = file.name;
+
+      const entries = await unzipHwpx(file);
+      const sectionNames = Object.keys(entries)
+        .filter(name => /^Contents\/section\d+\.xml$/i.test(name))
+        .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+      if (!sectionNames.length) throw new Error('본문 section XML을 찾지 못했습니다.');
+
+      const decoder = new TextDecoder('utf-8');
+      const parser = new DOMParser();
+      const docs = sectionNames.map(name => {
+        const doc = parser.parseFromString(decoder.decode(entries[name]), 'application/xml');
+        if (doc.querySelector('parsererror')) throw new Error(`${name} XML 파싱에 실패했습니다.`);
+        return doc;
+      });
+
+      renderHwpx(docs);
+      setStatus(`${file.name} 렌더링이 완료되었습니다.`, 'ready');
+    }
+
+    async function handleFile(file) {
+      if (!file) return;
+      if (!/\.hwpx$/i.test(file.name)) {
+        setStatus('HWPX 파일만 열 수 있습니다.');
+        return;
+      }
+      try {
+        await loadHwpx(file);
+      } catch (err) {
+        console.error(err);
+        setStatus(err.message || '파일을 읽는 중 오류가 발생했습니다.');
+      }
+    }
+
+    function clearAll() {
+      state.activeId = null;
+      for (const tag of TAGS) state.values[tag.id] = '';
+      $('hint').classList.remove('on');
+      renderTags();
+      setStatus(state.fileName ? `${state.fileName} 태그값을 초기화했습니다.` : '태그값을 초기화했습니다.', state.fileName ? 'ready' : '');
+    }
+
+    function exportJson() {
+      const payload = {
+        fileName: state.fileName,
+        taggedAt: new Date().toISOString(),
+        tags: Object.fromEntries(TAGS.map(tag => [tag.label, state.values[tag.id] || null])),
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'agenda-tags.json';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function initDropZone() {
+      const shell = $('viewer-shell');
+      shell.addEventListener('dragover', event => {
+        event.preventDefault();
+        shell.style.background = '#cfd8e6';
+      });
+      shell.addEventListener('dragleave', () => {
+        shell.style.background = '';
+      });
+      shell.addEventListener('drop', event => {
+        event.preventDefault();
+        shell.style.background = '';
+        handleFile(event.dataTransfer.files[0]);
+      });
+    }
+
+    $('hwpx-file').addEventListener('change', event => handleFile(event.target.files[0]));
+    $('clear-btn').addEventListener('click', clearAll);
+    $('export-btn').addEventListener('click', exportJson);
+    initDropZone();
+    renderTags();
+  </script>
+</body>
+</html>
