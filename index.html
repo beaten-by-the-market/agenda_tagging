@@ -695,21 +695,36 @@ function insertFieldInParagraph(xmlDoc, pNode, taggedText, tagId, label, fieldId
     }
   }
 
-  // fieldBegin ctrl run 생성
+  // fieldBegin ctrl run 생성 (누름틀 CLICK_HERE 타입)
   function makeBeginRun() {
     const run  = mk('run');
     const ctrl = mk('ctrl');
     const fb   = mk('fieldBegin');
     fb.setAttribute('id',       String(fieldId));
-    fb.setAttribute('type',     'PRIVATE_INFO');
+    fb.setAttribute('type',     'CLICK_HERE');
     fb.setAttribute('name',     tagId);
-    fb.setAttribute('editable', '0');
+    fb.setAttribute('editable', '1');
     fb.setAttribute('dirty',    '0');
-    fb.setAttribute('zorder',   '-1');
+    fb.setAttribute('zorder',   '0');
     fb.setAttribute('fieldid',  String(fieldId));
+
+    // 누름틀 파라미터: 안내문(Direction), 메모(HelpState)
+    const params   = mk('parameters');
+    const dirParam = mk('stringParam');
+    dirParam.setAttribute('name', 'Direction');
+    dirParam.textContent = label;
+    const helpParam = mk('stringParam');
+    helpParam.setAttribute('name', 'HelpState');
+    helpParam.textContent = '';
+    params.appendChild(dirParam);
+    params.appendChild(helpParam);
+    fb.appendChild(params);
+
+    // 태깅 메타데이터 보존
     const mt = mk('metaTag');
     mt.textContent = JSON.stringify({ schema: 'agenda-tagging/v1', tagId, label });
     fb.appendChild(mt);
+
     ctrl.appendChild(fb);
     run.appendChild(ctrl);
     return run;
