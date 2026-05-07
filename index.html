@@ -663,7 +663,7 @@ function markSelection(sel) {
 /* =============================================================
    HWPX fieldBegin / fieldEnd 삽입 (OWPML 표준 필드)
 ============================================================= */
-function insertFieldInParagraph(xmlDoc, pNode, taggedText, tagId, label, fieldId) {
+function insertFieldInParagraph(xmlDoc, pNode, taggedText, tagId, label, fieldId, strict = false) {
   // 직접 자식 run 요소와 텍스트 수집 (ctrl run 등 텍스트 없는 run 제외)
   const runData = [];
   for (const child of pNode.childNodes) {
@@ -782,6 +782,7 @@ function insertFieldInParagraph(xmlDoc, pNode, taggedText, tagId, label, fieldId
 
   const normStart = normFull.indexOf(normTagged);
   if (normStart === -1) {
+    if (strict) return false;
     // 찾지 못한 경우: 전체 문단 래핑
     pNode.insertBefore(makeBeginRun(), runData[0].run);
     pNode.insertBefore(makeEndRun(),   runData[runData.length - 1].run.nextSibling);
@@ -854,7 +855,7 @@ async function exportHwpx() {
   }
   const toExport = TAGS.filter(t => {
     const loc = state.tagLocations[t.id];
-    return loc && loc.xmlIdx >= 0;
+    return loc && loc.text;
   });
   if (toExport.length === 0) {
     setStatus('HWPX에 삽입할 태그가 없습니다. (문단/셀 클릭 또는 드래그로 태깅하세요.)'); return;
@@ -875,27 +876,42 @@ async function exportHwpx() {
 
     for (const tag of toExport) {
       const loc      = state.tagLocations[tag.id];
-      const nodeInfo = state.xmlNodeMap[loc.xmlIdx];
-      if (!nodeInfo) continue;
-
-      const { type, node, sectionIdx } = nodeInfo;
-      const workDoc  = workSections[sectionIdx].doc;
-
-      // 원본 노드 경로로 복사본 doc의 동등 노드 탐색
-      const path     = getNodePath(node);
-      const workNode = getNodeAtPath(workDoc.documentElement, path);
-      if (!workNode) { console.warn(`태그 ${tag.id}: 복사본 노드 탐색 실패`); continue; }
+      const nodeInfo = loc.xmlIdx >= 0 ? state.xmlNodeMap[loc.xmlIdx] : null;
 
       let inserted = false;
-      if (type === 'p') {
-        inserted = insertFieldInParagraph(workDoc, workNode, loc.text, tag.id, tag.label, fieldId);
-      } else if (type === 'tc') {
-        const pEls = Array.from(workNode.getElementsByTagName('*')).filter(e => localName(e) === 'p');
-        for (const p of pEls) {
-          inserted = insertFieldInParagraph(workDoc, p, loc.text, tag.id, tag.label, fieldId);
+
+      if (nodeInfo) {
+        const { type, node, sectionIdx } = nodeInfo;
+        const workDoc  = workSections[sectionIdx].doc;
+
+        // 원본 노드 경로로 복사본 doc의 동등 노드 탐색
+        const path     = getNodePath(node);
+        const workNode = getNodeAtPath(workDoc.documentElement, path);
+        if (workNode) {
+          if (type === 'p') {
+            inserted = insertFieldInParagraph(workDoc, workNode, loc.text, tag.id, tag.label, fieldId, true);
+          } else if (type === 'tc') {
+            const pEls = Array.from(workNode.getElementsByTagName('*')).filter(e => localName(e) === 'p');
+            for (const p of pEls) {
+              inserted = insertFieldInParagraph(workDoc, p, loc.text, tag.id, tag.label, fieldId, true);
+              if (inserted) break;
+            }
+          }
+        }
+      }
+
+      // xmlIdx=-1이거나 경로 탐색 실패 시: 전체 문서에서 텍스트 검색
+      if (!inserted) {
+        for (const { doc: workDoc } of workSections) {
+          const allP = Array.from(workDoc.getElementsByTagName('*')).filter(e => localName(e) === 'p');
+          for (const p of allP) {
+            inserted = insertFieldInParagraph(workDoc, p, loc.text, tag.id, tag.label, fieldId, true);
+            if (inserted) break;
+          }
           if (inserted) break;
         }
       }
+
       if (inserted) fieldId++;
       else console.warn(`태그 ${tag.id}: 텍스트 위치 탐색 실패 — "${loc.text}"`);
     }
