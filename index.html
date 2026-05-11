@@ -61,6 +61,28 @@
       align-items:center; padding:11px 12px; border-bottom:1px solid var(--soft); }
     .tag-name { font-weight:800; font-size:14px; overflow-wrap:anywhere; }
     .tag-select { padding:6px 9px; font-size:12px; }
+    .tag-actions { display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end; }
+    .tag-actions button { padding:6px 9px; font-size:12px; }
+    .btn-soft { background:#fff; color:#202938; border-color:var(--line); }
+    .btn-soft:hover { background:var(--soft); }
+    .btn-warn { background:#fff; color:#9a3a3a; border-color:#e2c2c2; }
+    .btn-warn:hover { background:#fdf2f2; }
+    .tag-units { margin:0; padding:0; list-style:none; font-size:13px; line-height:1.5; }
+    .tag-units li { display:flex; gap:6px; }
+    .tag-units .num { color:var(--brand); font-weight:700; flex:0 0 auto; }
+    .tag-units .txt { overflow-wrap:anywhere; }
+    .units-collapse { font-size:13px; }
+    .units-collapse > summary { cursor:pointer; padding:4px 0; color:var(--muted); font-weight:600;
+      list-style:revert; user-select:none; }
+    .units-collapse > summary:hover { color:var(--ink); }
+    .units-collapse[open] > summary { color:var(--ink); margin-bottom:4px; }
+    .units-header { font-size:13px; color:var(--muted); font-weight:600; padding:4px 0; }
+    .tagged-unit { background:var(--tag) !important; box-shadow:inset 0 -2px 0 var(--tag-line); border-radius:2px; }
+    p.p-in-cell { margin:0; padding:0; }
+    .unit-chip { display:inline-block; flex:0 0 auto; font-size:11px; font-weight:700;
+      padding:1px 6px; border-radius:3px; line-height:1.4; }
+    .unit-chip.t-p  { background:#e6f0fb; color:#0b4ba7; }
+    .unit-chip.t-tc { background:#e8f4ec; color:#087443; }
     .tag-value { min-height:42px; padding:10px 12px; color:var(--muted);
       font-size:13px; line-height:1.5; overflow-wrap:anywhere; }
     .tag-value.filled { color:var(--ink); background:#fbfffd; border-left:4px solid var(--ok); }
@@ -80,8 +102,8 @@
 
     .htable { width:100%; border-collapse:collapse; table-layout:fixed;
       margin:10px 0 16px; font-size:13px; }
-    .htable td { border:1px solid #657083; padding:6px 7px; vertical-align:middle;
-      line-height:1.45; overflow-wrap:anywhere; white-space:pre-wrap; }
+    .htable td { line-height:1.45; overflow-wrap:anywhere; white-space:pre-wrap;
+      vertical-align:middle; }
     .hcell { cursor:default; }
 
     .selected-fragment { background:var(--tag); box-shadow:inset 0 -2px 0 var(--tag-line);
@@ -91,6 +113,108 @@
       border-bottom:1px solid #f0d28c; background:#fff8df;
       color:#694a00; font-size:13px; font-weight:700; }
     .hint.on { display:flex; }
+
+    /* 표준 정보 헤더 */
+    .standard-bar { display:flex; align-items:center; justify-content:space-between;
+      gap:10px; padding:8px 12px; background:#f0f5fc; border-bottom:1px solid var(--line);
+      font-size:12px; }
+    .standard-bar .meta { color:#33445d; }
+    .standard-bar .meta b { color:var(--ink); }
+    .standard-bar .bar-actions { display:flex; gap:6px; }
+    .standard-bar button { padding:5px 9px; font-size:12px; }
+
+    /* 모달 */
+    .modal-overlay { position:fixed; inset:0; background:rgba(15,25,45,.45); display:none;
+      align-items:center; justify-content:center; z-index:50; }
+    .modal-overlay.on { display:flex; }
+    .modal { background:#fff; width:min(720px,92vw); max-height:88vh; display:flex; flex-direction:column;
+      border-radius:8px; box-shadow:0 20px 60px rgba(15,25,45,.35); overflow:hidden; }
+    .modal-head { padding:14px 18px; border-bottom:1px solid var(--line); display:flex;
+      align-items:center; justify-content:space-between; }
+    .modal-head h3 { margin:0; font-size:15px; }
+    .modal-body { padding:14px 18px; overflow:auto; }
+    .modal-foot { padding:12px 18px; border-top:1px solid var(--line); display:flex; gap:8px;
+      justify-content:flex-end; background:#fafbfd; }
+    .modal-foot .left { margin-right:auto; display:flex; gap:8px; }
+
+    .edit-row { display:grid; grid-template-columns:140px minmax(0,1fr) auto; gap:8px;
+      align-items:center; padding:6px 0; border-bottom:1px dashed var(--line); }
+    .edit-row input { padding:6px 8px; font:inherit; font-size:13px; border:1px solid var(--line);
+      border-radius:4px; min-width:0; width:100%; }
+    .edit-row input.id { font-family:ui-monospace,Consolas,monospace; color:#33445d; }
+    .edit-row .row-del { background:#fff; color:#9a3a3a; border:1px solid #e2c2c2; padding:5px 9px;
+      font-size:12px; }
+    .edit-row .row-del:hover { background:#fdf2f2; }
+    .edit-row.removed { opacity:0.45; text-decoration:line-through; }
+
+    .meta-form { display:grid; grid-template-columns:120px minmax(0,1fr); gap:8px 12px;
+      margin-top:14px; padding:12px; background:var(--soft); border-radius:6px; }
+    .meta-form label { font-size:13px; color:var(--muted); align-self:center; }
+    .meta-form input, .meta-form textarea { padding:6px 8px; font:inherit; font-size:13px;
+      border:1px solid var(--line); border-radius:4px; width:100%; }
+    .meta-form textarea { min-height:60px; resize:vertical; }
+
+    .history-list { font-size:13px; }
+    .history-list .row { padding:10px 0; border-bottom:1px solid var(--line); }
+    .history-list .row:last-child { border-bottom:none; }
+    .history-list .row .ts { font-weight:700; color:#33445d; }
+    .history-list .row .by { color:var(--muted); margin-left:8px; }
+    .history-list .row .memo { color:var(--ink); margin-top:4px; }
+    .history-list .chg { font-family:ui-monospace,Consolas,monospace; font-size:12px;
+      background:#fff; border:1px solid var(--line); padding:6px 8px; border-radius:4px; margin-top:6px;
+      overflow-wrap:anywhere; }
+    .history-list .chg.add { background:#eefbef; border-color:#c5e6cb; }
+    .history-list .chg.del { background:#fdeeee; border-color:#e6c5c5; }
+    .history-list .chg.mod { background:#fff8e1; border-color:#e6d6a3; }
+
+    /* 도움말 모달 */
+    .help-modal { width:min(880px,94vw); max-height:90vh; }
+    .help h2 { font-size:16px; margin:18px 0 8px; color:var(--brand-dark);
+      padding-bottom:4px; border-bottom:2px solid var(--soft); }
+    .help h2:first-child { margin-top:0; }
+    .help h3 { font-size:14px; margin:14px 0 6px; color:var(--ink); }
+    .help p, .help li { font-size:13.5px; line-height:1.65; color:#33445d; }
+    .help ul, .help ol { margin:6px 0 8px; padding-left:22px; }
+    .help li { margin:2px 0; }
+    .help code, .help .kbd { font-family:ui-monospace,Consolas,monospace; font-size:12.5px;
+      background:var(--soft); padding:1px 5px; border-radius:3px; color:#0b4ba7; }
+    .help .kbd { border:1px solid var(--line); background:#fff; }
+    .help .tip { background:#fff8df; border:1px solid #f0d28c; border-left:4px solid #d9a418;
+      padding:10px 12px; border-radius:4px; margin:8px 0; font-size:13px; color:#5b4400; }
+    .help .note { background:#eef5fb; border-left:4px solid var(--brand); padding:10px 12px;
+      border-radius:4px; margin:8px 0; font-size:13px; color:#233a5b; }
+    .help .step-flow { display:flex; gap:8px; align-items:center; flex-wrap:wrap;
+      margin:10px 0; font-size:13px; }
+    .help .step { background:#fff; border:1px solid var(--line); border-radius:6px;
+      padding:8px 12px; box-shadow:0 1px 2px rgba(20,35,60,.04); min-width:120px; }
+    .help .step b { display:block; color:var(--brand-dark); font-size:12px; margin-bottom:2px; }
+    .help .arrow { color:var(--muted); font-weight:700; }
+
+    .help .rule-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:10px; margin:10px 0; }
+    .help .rule { background:#fff; border:1px solid var(--line); border-radius:6px; padding:10px 12px; }
+    .help .rule .case { font-size:12px; color:var(--muted); font-weight:700; margin-bottom:4px; }
+    .help .rule .result { font-size:13px; color:var(--ink); font-weight:700; margin-bottom:6px; }
+    .help .rule .diag { font-family:ui-monospace,Consolas,monospace; font-size:11.5px;
+      background:#fafbfd; border:1px dashed var(--line); border-radius:4px;
+      padding:8px; white-space:pre; line-height:1.5; color:#33445d; overflow-x:auto; }
+    .help .rule .diag .hl { background:#fff2a8; padding:0 2px; }
+    .help .rule .diag .hl-cell { background:#fff2a8; outline:1px solid #d9a418; }
+
+    .help .data-table { width:100%; border-collapse:collapse; font-size:13px; margin:6px 0; }
+    .help .data-table th, .help .data-table td { border:1px solid var(--line); padding:6px 8px;
+      text-align:left; vertical-align:top; }
+    .help .data-table th { background:var(--soft); font-weight:700; }
+    .help .data-table code { font-size:12px; }
+
+    .help pre.json { background:#f5f7fa; border:1px solid var(--line); border-radius:4px;
+      padding:10px 12px; font-size:12px; line-height:1.5; overflow-x:auto; }
+
+    .help .btn-demo { display:inline-block; background:var(--brand); color:#fff; padding:2px 8px;
+      border-radius:4px; font-size:12px; font-weight:700; }
+    .help .btn-demo.soft { background:#fff; color:#202938; border:1px solid var(--line); }
+    .help .btn-demo.warn { background:#fff; color:#9a3a3a; border:1px solid #e2c2c2; }
+    .help .btn-demo.ok   { background:#087443; }
 
     @media (max-width:900px) {
       .layout { height:auto; min-height:calc(100vh - 92px); grid-template-columns:1fr; }
@@ -113,6 +237,7 @@
       <button class="secondary" id="clear-btn" type="button">초기화</button>
       <button id="export-json-btn" type="button">JSON 내보내기</button>
       <button id="export-hwpx-btn" class="success" type="button">HWPX 저장</button>
+      <button id="help-btn" class="secondary" type="button" title="사용법 보기">? 도움말</button>
     </div>
   </header>
 
@@ -127,6 +252,13 @@
         <div class="pane-title">태그대상 항목</div>
         <div class="counter" id="tag-count">0 / 6</div>
       </div>
+      <div class="standard-bar">
+        <div class="meta">현재 표준: <b id="standard-date">-</b> 기준</div>
+        <div class="bar-actions">
+          <button class="secondary" id="edit-standard-btn" type="button">수정</button>
+          <button class="secondary" id="history-btn"        type="button">이력</button>
+        </div>
+      </div>
       <div class="tag-list" id="tag-list"></div>
     </section>
 
@@ -135,7 +267,7 @@
         <div class="pane-title">HWPX 원문</div>
         <div class="counter" id="doc-name">문서 없음</div>
       </div>
-      <div class="hint" id="hint">활성 항목에 넣을 텍스트를 드래그하거나 문단/셀을 클릭하세요.</div>
+      <div class="hint" id="hint">문단/셀을 클릭하거나 드래그로 범위 선택하세요. 표는 통째로 또는 단일 셀 단위로 선택됩니다.</div>
       <div class="viewer-shell" id="viewer-shell">
         <div class="doc">
           <div class="drop" id="drop-zone">
@@ -149,11 +281,226 @@
     </section>
   </main>
 
+  <!-- 표준 수정 모달 -->
+  <div class="modal-overlay" id="edit-modal">
+    <div class="modal">
+      <div class="modal-head">
+        <h3>태그대상 항목 수정</h3>
+        <button class="secondary" data-close="edit-modal" type="button">닫기</button>
+      </div>
+      <div class="modal-body">
+        <div id="edit-rows"></div>
+        <div style="margin-top:10px;">
+          <button class="secondary" id="add-row-btn" type="button">+ 항목 추가</button>
+        </div>
+        <div class="meta-form">
+          <label for="edit-standard-date">표준 일자</label>
+          <input id="edit-standard-date" type="date">
+          <label for="edit-editor">수정자</label>
+          <input id="edit-editor" type="text" placeholder="이름">
+          <label for="edit-memo">변경 메모</label>
+          <textarea id="edit-memo" placeholder="이번 수정 사유 / 참고사항"></textarea>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <div class="left">
+          <button class="secondary" id="import-std-btn" type="button">JSON 불러오기</button>
+          <button class="secondary" id="export-std-btn" type="button">JSON 내보내기</button>
+          <input id="import-std-file" type="file" accept=".json,application/json" style="display:none;">
+        </div>
+        <button class="secondary" data-close="edit-modal" type="button">취소</button>
+        <button class="success" id="save-standard-btn" type="button">저장</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 도움말 모달 -->
+  <div class="modal-overlay" id="help-modal">
+    <div class="modal help-modal">
+      <div class="modal-head">
+        <h3>HWPX 안건 태깅 시스템 — 사용법</h3>
+        <button class="secondary" data-close="help-modal" type="button">닫기</button>
+      </div>
+      <div class="modal-body help">
+
+        <h2>1. 한눈에 보기 — 작업 흐름</h2>
+        <div class="step-flow">
+          <div class="step"><b>① 열기</b>상단 <span class="kbd">HWPX 열기</span>로 파일 로드</div>
+          <span class="arrow">→</span>
+          <div class="step"><b>② 항목 선택</b>좌측 카드의 <span class="btn-demo">선택</span> 버튼</div>
+          <span class="arrow">→</span>
+          <div class="step"><b>③ 영역 잡기</b>원문에서 클릭 또는 드래그</div>
+          <span class="arrow">→</span>
+          <div class="step"><b>④ 저장</b><span class="btn-demo ok">HWPX 저장</span> 또는 <span class="btn-demo">JSON 내보내기</span></div>
+        </div>
+        <p>좌측 항목 하나마다 본문에서 근거가 되는 영역을 여러 개 잡아서 묶을 수 있고, 결과는 한컴 누름틀(<code>fieldBegin</code>/<code>fieldEnd</code>) 또는 JSON으로 저장됩니다.</p>
+
+        <h2>2. 좌측 패널 — 태그대상 항목</h2>
+        <ul>
+          <li><b>현재 표준:</b> 카드 위쪽에 <code>YYYY-MM-DD 기준</code>으로 표시됩니다. 표준 자체는 <span class="btn-demo soft">수정</span>으로 변경하고, 변경 이력은 <span class="btn-demo soft">이력</span>에서 확인.</li>
+          <li><b>각 항목 카드</b>는 다음 상태를 가집니다:
+            <ul>
+              <li>아직 잡힌 영역이 없음 → <span class="btn-demo">선택</span></li>
+              <li>잡힌 영역이 있음 → <span class="btn-demo warn">초기화</span> <span class="btn-demo">추가</span></li>
+              <li>활성 중(영역 잡는 중) → <span class="btn-demo">선택 중</span> / <span class="btn-demo">추가 중</span></li>
+            </ul>
+          </li>
+          <li><b>미리보기:</b> 잡힌 영역들이 <code>1. [문단] ...</code> / <code>2. [셀] ...</code> 같은 번호 리스트로 표시. 6개를 넘으면 자동 접힘.</li>
+        </ul>
+
+        <h2>3. 우측 원문 — 영역 잡는 방법</h2>
+
+        <h3>3-1. 클릭 (단일 영역)</h3>
+        <ul>
+          <li><b>일반 문단 위 클릭</b> → 그 문단 통째.</li>
+          <li><b>셀 안 문단 위 클릭</b> → 그 문단. (단, 셀에 문단이 <b>하나뿐</b>이면 자동으로 셀 전체로 승격됨.)</li>
+          <li><b>셀 여백/패딩 클릭</b> → 그 셀 전체.</li>
+        </ul>
+
+        <h3>3-2. 드래그 (여러 영역 한 번에)</h3>
+        <p>드래그가 어디에 걸치느냐에 따라 다음 4가지 규칙으로 자동 판정됩니다.</p>
+
+        <div class="rule-grid">
+          <div class="rule">
+            <div class="case">CASE 1 · 한 문단 안</div>
+            <div class="result">→ 그 문단 1개</div>
+            <div class="diag">○ <span class="hl">…드래그…</span> 끝남
+다음 문단은 그대로</div>
+          </div>
+          <div class="rule">
+            <div class="case">CASE 2 · 여러 문단 가로지름</div>
+            <div class="result">→ 각 문단 따로 (N개)</div>
+            <div class="diag"><span class="hl">○ 첫 문단 전체</span>
+<span class="hl">○ 둘째 문단 전체</span>
+<span class="hl">○ 셋째 문단 전체</span></div>
+          </div>
+          <div class="rule">
+            <div class="case">CASE 3 · 한 셀 안 여러 문단</div>
+            <div class="result">→ 그 셀 전체 (1개)</div>
+            <div class="diag">┌─────────────┐
+│<span class="hl-cell">결의일       </span>│
+│<span class="hl-cell">납입일       </span>│
+│<span class="hl-cell">조달금액     </span>│
+└─────────────┘</div>
+          </div>
+          <div class="rule">
+            <div class="case">CASE 4 · 여러 셀 또는 표 안↔밖</div>
+            <div class="result">→ 표 전체 (모든 셀 N개)</div>
+            <div class="diag">┌─────┬─────┐
+│<span class="hl-cell">A1   </span>│<span class="hl-cell">B1   </span>│
+├─────┼─────┤
+│<span class="hl-cell">A2   </span>│<span class="hl-cell">B2   </span>│
+└─────┴─────┘</div>
+          </div>
+        </div>
+
+        <div class="tip"><b>요점:</b> 셀과 문단이 섞이면 항상 "더 큰 단위로 승격"됩니다. 한 셀 안 단일 문단을 정밀히 잡고 싶을 때는 그 셀에 문단이 2개 이상이어야 합니다.</div>
+
+        <h2>4. 모드 — 선택 · 추가 · 초기화</h2>
+        <table class="data-table">
+          <tr><th>버튼</th><th>동작</th><th>언제 쓰나</th></tr>
+          <tr><td><span class="btn-demo">선택</span></td><td>새로 영역을 잡음. 기존이 있었다면 교체.</td><td>처음 잡을 때 / 다시 잡고 싶을 때 (초기화 후)</td></tr>
+          <tr><td><span class="btn-demo">추가</span></td><td>기존 영역은 유지하고 새 영역을 <b>덧붙임</b>.</td><td>다른 페이지/문단을 같은 항목에 더 묶고 싶을 때</td></tr>
+          <tr><td><span class="btn-demo warn">초기화</span></td><td>그 항목의 모든 영역을 비움.</td><td>잘못 잡았을 때 / 처음부터 다시 할 때</td></tr>
+        </table>
+        <div class="note"><b>중복 자동 정리:</b> "추가"로 셀과 그 안의 문단이 동시에 잡히면, 문단은 자동 제거되어 셀만 남습니다.</div>
+
+        <h2>5. 표준 항목 관리</h2>
+        <p>좌측 표준 바의 <span class="btn-demo soft">수정</span>을 누르면 항목 자체를 변경할 수 있습니다.</p>
+        <ul>
+          <li><b>항목 추가:</b> <span class="kbd">+ 항목 추가</span>로 새 행, 영문 ID(필수)와 표시 이름 입력.</li>
+          <li><b>항목 삭제:</b> 행의 <span class="btn-demo warn">삭제</span> 토글. 잘못 눌렀으면 같은 자리에서 <span class="btn-demo soft">복원</span>.</li>
+          <li><b>이름 변경:</b> 표시 이름을 그 자리에서 수정.</li>
+          <li><b>표준 일자 · 수정자 · 메모:</b> 누가 언제 왜 바꿨는지 같이 기록.</li>
+          <li><b>저장</b>하면 자동으로 이력에 등재 + localStorage에 보관.</li>
+        </ul>
+        <p><span class="btn-demo soft">이력</span> 버튼으로 시간순 변경 내역(추가/삭제/수정)을 색상 구분된 박스로 확인할 수 있습니다.</p>
+
+        <h2>6. 표준 공유 — JSON 가져오기/내보내기</h2>
+        <p>표준 자체를 다른 PC/동료와 맞추려면 수정 모달 하단의:</p>
+        <ul>
+          <li><span class="btn-demo soft">JSON 내보내기</span> — 현재 표준(항목 + 전체 이력)을 <code>agenda-tagging-standard_YYYY-MM-DD.json</code> 파일로 저장.</li>
+          <li><span class="btn-demo soft">JSON 불러오기</span> — 받은 JSON 파일을 적용 (현재 localStorage 표준 덮어쓰기).</li>
+        </ul>
+
+        <h2>7. 결과 파일 — 무엇이 어떻게 저장되나</h2>
+
+        <h3>HWPX (누름틀)</h3>
+        <p>각 잡은 영역(unit)이 하나의 누름틀이 됩니다. 같은 항목이 여러 영역이면 같은 prefix + 번호.</p>
+        <pre class="json">&lt;hp:fieldBegin id="..." type="CLICK_HERE" name="<b>companyName_1</b>" ...&gt;
+  &lt;hp:parameters&gt;
+    &lt;hp:stringParam name="Direction"&gt;기업명 (1/3)&lt;/hp:stringParam&gt;
+  &lt;/hp:parameters&gt;
+  &lt;hp:metaTag&gt;{
+    "schema":"agenda-tagging/v1",
+    "tagId":"companyName", "label":"기업명",
+    "partIndex":1, "partCount":3,
+    "unitType":"tc"
+  }&lt;/hp:metaTag&gt;
+&lt;/hp:fieldBegin&gt;
+   …태깅된 본문…
+&lt;hp:fieldEnd beginIDRef="..." /&gt;</pre>
+
+        <h3>JSON</h3>
+        <pre class="json">{
+  "fileName": "샘플서식.hwpx",
+  "taggedAt": "2026-05-11T...Z",
+  "tags": {
+    "기업명": [
+      { "partIndex":1, "partCount":3, "type":"p",  "text":"…" },
+      { "partIndex":2, "partCount":3, "type":"tc", "text":"…" },
+      { "partIndex":3, "partCount":3, "type":"tc", "text":"…" }
+    ],
+    "사유발생일": [ ... ],
+    ...
+  }
+}</pre>
+
+        <h3>필드 의미</h3>
+        <table class="data-table">
+          <tr><th>필드</th><th>의미</th></tr>
+          <tr><td><code>tagId</code></td><td>표준 항목의 영문 ID</td></tr>
+          <tr><td><code>label</code></td><td>표준 항목의 표시 이름</td></tr>
+          <tr><td><code>partIndex</code> / <code>partCount</code></td><td>같은 항목 내 몇 번째 / 총 몇 개 영역인지</td></tr>
+          <tr><td><code>type</code> / <code>unitType</code></td><td><code>p</code>=문단, <code>tc</code>=셀</td></tr>
+        </table>
+
+        <h2>8. 자주 발생하는 상황</h2>
+        <ul>
+          <li><b>표를 가로지른 영역이 너무 크게 잡힘</b> → 의도적입니다(표 전체로 확장). 셀 하나만 잡고 싶으면 그 셀 안에서만 드래그·클릭.</li>
+          <li><b>잡으니 [문단]이 아니라 [셀]로 잡힘</b> → 그 셀에 문단이 하나뿐이라 자동 승격된 것. 동치이므로 보통 그대로 사용해도 무방.</li>
+          <li><b>같은 항목을 여러 곳에 흩어 잡고 싶다</b> → <span class="btn-demo">추가</span>로 누적. 페이지/섹션이 달라도 OK.</li>
+          <li><b>저장 메시지의 필드 개수와 실제가 다르다</b> → 콘솔에 "삽입 실패" 경고가 있는지 확인. 보통 셀 안 문단 매칭 실패가 원인입니다.</li>
+        </ul>
+
+      </div>
+      <div class="modal-foot">
+        <button class="secondary" data-close="help-modal" type="button">닫기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 이력 모달 -->
+  <div class="modal-overlay" id="history-modal">
+    <div class="modal">
+      <div class="modal-head">
+        <h3>표준 변경 이력</h3>
+        <button class="secondary" data-close="history-modal" type="button">닫기</button>
+      </div>
+      <div class="modal-body">
+        <div class="history-list" id="history-list"></div>
+      </div>
+      <div class="modal-foot">
+        <button class="secondary" data-close="history-modal" type="button">닫기</button>
+      </div>
+    </div>
+  </div>
+
 <script>
 /* =============================================================
-   태그 정의
+   태그 정의 — 표준은 localStorage에서 로드, 기본 시드 사용
 ============================================================= */
-const TAGS = [
+const DEFAULT_TAGS = [
   { id: 'companyName',       label: '기업명' },
   { id: 'eventDate',         label: '사유발생일' },
   { id: 'noticeDate',        label: '지정예고일' },
@@ -162,20 +509,81 @@ const TAGS = [
   { id: 'mitigationReview',  label: '정상참작 사유 관련 검토' },
 ];
 
+const STD_STORAGE_KEY    = 'agenda-tagging-standard';
+const EDITOR_STORAGE_KEY = 'agenda-tagging-editor';
+
+function todayISO() {
+  const d = new Date();
+  const yyyy = d.getFullYear();
+  const mm   = String(d.getMonth() + 1).padStart(2, '0');
+  const dd   = String(d.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
+}
+
+function loadStandard() {
+  try {
+    const raw = localStorage.getItem(STD_STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed && Array.isArray(parsed.tags)) return parsed;
+    }
+  } catch { /* ignore */ }
+  // 기본 시드
+  return {
+    version:      'agenda-tagging-standard/v1',
+    standardDate: todayISO(),
+    tags:         DEFAULT_TAGS.map(t => ({ ...t })),
+    history: [{
+      timestamp:  new Date().toISOString(),
+      changeType: 'seed',
+      editor:     '(시스템)',
+      memo:       '초기 표준 시드',
+      before:     null,
+      after:      DEFAULT_TAGS.map(t => ({ ...t })),
+    }],
+  };
+}
+
+function saveStandard(std) {
+  localStorage.setItem(STD_STORAGE_KEY, JSON.stringify(std));
+}
+
+let STANDARD = loadStandard();
+let TAGS     = STANDARD.tags.map(t => ({ ...t }));
+
 /* =============================================================
    전역 상태
 ============================================================= */
 const state = {
   activeId:     null,
-  values:       Object.fromEntries(TAGS.map(t => [t.id, ''])),
-  tagLocations: {},   // tagId -> { xmlIdx: number, text: string }
+  activeMode:   'replace',  // 'replace' | 'append'
+  tagLocations: {},   // tagId -> [{ type:'p'|'tc', xmlIdx, text, rawText, sectionIdx }]
+  expanded:     new Set(),  // tagId 집합 (unit 리스트가 펼쳐진 항목)
   fileName:     '',
-  rawEntries:   {},   // name -> { data, compressed, method, crc32, compressedSize, uncompressedSize }
-  xmlSections:  [],   // [{ name, doc }]
-  xmlNodeMap:   [],   // [{ type:'p'|'tc', node: XMLElement, sectionIdx: number }]
+  rawEntries:   {},
+  xmlSections:  [],
+  xmlNodeMap:   [],
 };
 
-let gStyles = { charShapes: new Map(), parShapes: new Map() };
+const UNITS_COLLAPSE_THRESHOLD = 5;
+
+// 호환 헬퍼
+function getUnits(tagId) {
+  const arr = state.tagLocations[tagId];
+  return Array.isArray(arr) ? arr : [];
+}
+function setUnits(tagId, units) {
+  if (!units || units.length === 0) delete state.tagLocations[tagId];
+  else state.tagLocations[tagId] = units;
+}
+
+let gStyles = {
+  charShapes:  new Map(),
+  parShapes:   new Map(),
+  borderFills: new Map(),
+  hangulFonts: new Map(),
+  latinFonts:  new Map(),
+};
 
 /* =============================================================
    기본 유틸리티
@@ -427,50 +835,213 @@ function textFromNode(el) {
 }
 
 /* =============================================================
-   스타일 파싱
+   스타일 파싱 (HWPX 실제 구조 기반)
 ============================================================= */
+
+// HWP 테두리 타입 → CSS border-style
+function hwpBorderType(type) {
+  switch ((type || '').toUpperCase()) {
+    case 'SOLID':  return 'solid';
+    case 'DASHED': case 'DASH': return 'dashed';
+    case 'DOTTED': case 'DOT': return 'dotted';
+    case 'DOUBLE': return 'double';
+    default:       return 'solid';
+  }
+}
+
+// "0.5 mm" → px (최소 1px)
+function mmWidthToPx(str) {
+  const m = /([0-9.]+)\s*mm/.exec(str || '');
+  if (!m) return 1;
+  return Math.max(1, Math.round(parseFloat(m[1]) * 3.7795));
+}
+
+function parseBorderSide(el) {
+  if (!el) return null;
+  const type = (el.getAttribute('type') || 'NONE').toUpperCase();
+  if (type === 'NONE') return null;
+  return {
+    style: hwpBorderType(type),
+    width: mmWidthToPx(el.getAttribute('width')),
+    color: el.getAttribute('color') || '#000000',
+  };
+}
+
+function borderSideCSS(side) {
+  if (!side) return 'none';
+  return `${side.width}px ${side.style} ${side.color}`;
+}
+
 function parseStyles(headerDoc) {
-  const charShapes = new Map(), parShapes = new Map();
-  if (!headerDoc) return { charShapes, parShapes };
-  for (const el of headerDoc.getElementsByTagName('*')) {
-    const n = localName(el);
-    if (n === 'charShape') {
-      const id = el.getAttribute('id'); if (id == null) continue;
-      const shape = {};
-      for (const c of el.children) {
-        const cn = localName(c);
-        if (cn === 'height') shape.height = parseInt(c.textContent) || null;
-        else if (cn === 'prop') {
-          shape.bold      = c.getAttribute('bold')    === '1';
-          shape.italic    = c.getAttribute('italic')  === '1';
-          const ul = c.getAttribute('underline');
-          shape.underline = ul && ul !== '0' && ul !== 'NONE';
-          const st = c.getAttribute('strikeout');
-          shape.strikeout = st && st !== '0' && st !== 'NONE';
-        } else if (cn === 'textColor') {
-          shape.color = c.getAttribute('fore') || c.getAttribute('foreColor') || null;
-        }
-      }
-      charShapes.set(String(id), shape);
-    }
-    if (n === 'parShape') {
-      const id = el.getAttribute('id'); if (id == null) continue;
-      const shape = {};
-      for (const c of el.children) {
-        const cn = localName(c);
-        if (cn === 'align') shape.align = c.textContent.trim().toUpperCase();
-        else if (cn === 'margin') {
-          shape.leftIndent = parseInt(c.getAttribute('left')   || '0') || 0;
-          shape.indent     = parseInt(c.getAttribute('indent') || '0') || 0;
-        } else if (cn === 'lineSpacing') {
-          shape.lineSpacingType = (c.getAttribute('type')  || 'RATIO').toUpperCase();
-          shape.lineSpacing     = parseInt(c.getAttribute('value') || '0') || 0;
-        }
-      }
-      parShapes.set(String(id), shape);
+  const charShapes  = new Map();
+  const parShapes   = new Map();
+  const borderFills = new Map();
+  const hangulFonts = new Map();
+  const latinFonts  = new Map();
+
+  if (!headerDoc) return { charShapes, parShapes, borderFills, hangulFonts, latinFonts };
+
+  // ── fontface 블록 파싱 ──
+  for (const ffEl of headerDoc.getElementsByTagName('*')) {
+    if (localName(ffEl) !== 'fontface') continue;
+    const lang = (ffEl.getAttribute('lang') || '').toUpperCase();
+    const targetMap = lang === 'HANGUL' ? hangulFonts
+                    : lang === 'LATIN'  ? latinFonts
+                    : null;
+    if (!targetMap) continue;
+    for (const fontEl of ffEl.children) {
+      if (localName(fontEl) !== 'font') continue;
+      const fid  = fontEl.getAttribute('id');
+      const face = fontEl.getAttribute('face');
+      if (fid != null && face) targetMap.set(String(fid), face);
     }
   }
-  return { charShapes, parShapes };
+
+  // ── borderFill 파싱 ──
+  for (const el of headerDoc.getElementsByTagName('*')) {
+    if (localName(el) !== 'borderFill') continue;
+    const id = el.getAttribute('id');
+    if (id == null) continue;
+    const bf = { left: null, right: null, top: null, bottom: null, fillColor: null };
+    for (const c of el.children) {
+      const cn = localName(c);
+      if      (cn === 'leftBorder')   bf.left   = parseBorderSide(c);
+      else if (cn === 'rightBorder')  bf.right  = parseBorderSide(c);
+      else if (cn === 'topBorder')    bf.top    = parseBorderSide(c);
+      else if (cn === 'bottomBorder') bf.bottom = parseBorderSide(c);
+      else if (cn === 'fillBrush') {
+        for (const fc of c.getElementsByTagName('*')) {
+          const fc2 = fc.getAttribute('faceColor') || '';
+          if (fc2 && fc2.toLowerCase() !== 'none' && /^#[0-9a-fA-F]{6}$/.test(fc2)) {
+            bf.fillColor = fc2; break;
+          }
+        }
+      }
+    }
+    borderFills.set(String(id), bf);
+  }
+
+  // ── charPr 파싱 ──
+  for (const el of headerDoc.getElementsByTagName('*')) {
+    if (localName(el) !== 'charPr') continue;
+    const id = el.getAttribute('id');
+    if (id == null) continue;
+    const shape = {
+      height:     parseInt(el.getAttribute('height') || '0') || null,
+      textColor:  el.getAttribute('textColor')  || null,
+      shadeColor: el.getAttribute('shadeColor') || null,
+      bold:       false, italic: false,
+      underline:  false, strikeout: false,
+      fontHangul: null, fontLatin: null,
+      offsetHangul: 0, relSzHangul: 100,
+    };
+    for (const c of el.children) {
+      const cn = localName(c);
+      if      (cn === 'bold')      { shape.bold   = true; }
+      else if (cn === 'italic')    { shape.italic = true; }
+      else if (cn === 'underline') {
+        shape.underline = (c.getAttribute('type') || 'NONE').toUpperCase() !== 'NONE';
+      }
+      else if (cn === 'strikeout') {
+        shape.strikeout = (c.getAttribute('shape') || 'NONE').toUpperCase() !== 'NONE';
+      }
+      else if (cn === 'fontRef') {
+        shape.fontHangul = c.getAttribute('hangul');
+        shape.fontLatin  = c.getAttribute('latin');
+      }
+      else if (cn === 'offset') {
+        shape.offsetHangul = parseInt(c.getAttribute('hangul') || '0') || 0;
+      }
+      else if (cn === 'relSz') {
+        shape.relSzHangul = parseInt(c.getAttribute('hangul') || '100') || 100;
+      }
+    }
+    charShapes.set(String(id), shape);
+  }
+
+  // ── paraPr 파싱 ──
+  for (const el of headerDoc.getElementsByTagName('*')) {
+    if (localName(el) !== 'paraPr') continue;
+    const id = el.getAttribute('id');
+    if (id == null) continue;
+    const shape = {
+      align: null, leftIndent: 0, firstIndent: 0,
+      prev: 0, next: 0,
+      lineSpacingType: 'PERCENT', lineSpacing: 160,
+      borderFillIDRef: null, pageBreakBefore: false,
+    };
+
+    const applyMarginEl = (marginEl) => {
+      for (const m of marginEl.children) {
+        const mn = localName(m);
+        const v  = parseInt(m.getAttribute('value') || '0') || 0;
+        if      (mn === 'intent' || mn === 'indent') shape.firstIndent = v;
+        else if (mn === 'left')  shape.leftIndent = v;
+        else if (mn === 'prev')  shape.prev = v;
+        else if (mn === 'next')  shape.next = v;
+      }
+    };
+
+    for (const c of el.children) {
+      const cn = localName(c);
+      if (cn === 'align') {
+        shape.align = (c.getAttribute('horizontal') || '').toUpperCase();
+      }
+      else if (cn === 'margin') {
+        applyMarginEl(c);
+      }
+      else if (cn === 'lineSpacing') {
+        shape.lineSpacingType = (c.getAttribute('type') || 'PERCENT').toUpperCase();
+        shape.lineSpacing     = parseInt(c.getAttribute('value') || '160') || 160;
+      }
+      else if (cn === 'breakSetting') {
+        shape.pageBreakBefore = c.getAttribute('pageBreakBefore') === '1';
+      }
+      else if (cn === 'border') {
+        shape.borderFillIDRef = c.getAttribute('borderFillIDRef');
+      }
+      // hp:switch/hp:case/hp:default 내부 margin·lineSpacing 처리
+      else if (cn === 'switch') {
+        for (const caseEl of c.children) {
+          const caseName = localName(caseEl);
+          if (caseName === 'default' || caseName === 'case') {
+            for (const inner of caseEl.children) {
+              const inn = localName(inner);
+              if (inn === 'margin') applyMarginEl(inner);
+              else if (inn === 'lineSpacing') {
+                shape.lineSpacingType = (inner.getAttribute('type') || 'PERCENT').toUpperCase();
+                shape.lineSpacing = parseInt(inner.getAttribute('value') || '160') || 160;
+              }
+            }
+          }
+        }
+      }
+    }
+    parShapes.set(String(id), shape);
+  }
+
+  return { charShapes, parShapes, borderFills, hangulFonts, latinFonts };
+}
+
+// 한컴 폰트명 → CSS font-family (폴백 포함)
+const HANCOM_FONT_FALLBACK = {
+  '함초롬바탕': '"함초롬바탕","HCR Batang",serif',
+  '함초롬돋움': '"함초롬돋움","HCR Dotum",sans-serif',
+  '맑은 고딕':  '"맑은 고딕","Malgun Gothic",sans-serif',
+  '나눔고딕':   '"나눔고딕","NanumGothic",sans-serif',
+  '나눔명조':   '"나눔명조","NanumMyeongjo",serif',
+  'HY신명조M':  '"HY신명조","HY Sinmyeongjo",serif',
+  'HY헤드라인M': '"HY헤드라인","HY Headline",sans-serif',
+  '굴림':       '"굴림","Gulim",sans-serif',
+  '돋움':       '"돋움","Dotum",sans-serif',
+  '바탕':       '"바탕","Batang",serif',
+  '궁서':       '"궁서","Gungsuh",serif',
+};
+
+function resolveFontFamily(fontName) {
+  if (!fontName) return null;
+  if (HANCOM_FONT_FALLBACK[fontName]) return HANCOM_FONT_FALLBACK[fontName];
+  return `"${fontName}"`;
 }
 
 function charShapeToStyle(id) {
@@ -478,34 +1049,103 @@ function charShapeToStyle(id) {
   const s = gStyles.charShapes.get(String(id));
   if (!s) return '';
   const p = [];
-  if (s.height) { const pt = s.height / 100; if (pt >= 4 && pt <= 96) p.push(`font-size:${pt}pt`); }
+
+  if (s.height) {
+    const pt = s.height / 100;
+    if (pt >= 4 && pt <= 96) p.push(`font-size:${pt}pt`);
+  }
   if (s.bold)      p.push('font-weight:700');
   if (s.italic)    p.push('font-style:italic');
+
   const deco = [];
   if (s.underline)  deco.push('underline');
   if (s.strikeout)  deco.push('line-through');
   if (deco.length)  p.push(`text-decoration:${deco.join(' ')}`);
-  if (s.color && s.color !== '000000' && s.color !== '') p.push(`color:#${s.color}`);
+
+  if (s.textColor && s.textColor !== '#000000' && s.textColor !== '')
+    p.push(`color:${s.textColor}`);
+  if (s.shadeColor && s.shadeColor.toLowerCase() !== 'none' && s.shadeColor !== '')
+    p.push(`background-color:${s.shadeColor}`);
+
+  const fontName = s.fontHangul != null ? gStyles.hangulFonts.get(String(s.fontHangul)) : null;
+  const ff = resolveFontFamily(fontName);
+  if (ff) p.push(`font-family:${ff},"Malgun Gothic","맑은 고딕",sans-serif`);
+
+  // 위/아래 첨자 (offset이 있고 relSz가 100 미만일 때)
+  if (s.offsetHangul !== 0 && s.relSzHangul < 100) {
+    const sz = (s.relSzHangul / 100).toFixed(2);
+    p.push(`font-size:${sz}em`);
+    p.push(s.offsetHangul > 0 ? 'vertical-align:super' : 'vertical-align:sub');
+  }
+
   return p.join(';');
 }
+
+const ALIGN_MAP = { CENTER:'center', RIGHT:'right', LEFT:'left',
+  JUSTIFY:'justify', BOTH:'justify', DISTRIBUTE:'justify' };
 
 function parShapeToStyle(id) {
   if (id == null) return '';
   const s = gStyles.parShapes.get(String(id));
   if (!s) return '';
   const p = [];
-  const aMap = { CENTER:'center', RIGHT:'right', LEFT:'left',
-    JUSTIFY:'justify', BOTH:'justify', DISTRIBUTE:'justify' };
-  if (s.align && aMap[s.align]) p.push(`text-align:${aMap[s.align]}`);
-  if (s.leftIndent > 0) {
-    const px = Math.round(s.leftIndent / 75); if (px > 0) p.push(`padding-left:${px}px`);
+
+  if (s.align && ALIGN_MAP[s.align]) p.push(`text-align:${ALIGN_MAP[s.align]}`);
+
+  // 들여쓰기: 음수 firstIndent는 "행걸이(hanging indent)"로 처리해
+  // 페이지 경계 바깥으로 흘러나가지 않도록 padding-left으로 보정
+  {
+    const leftPx  = Math.max(0, Math.round(s.leftIndent  / 75));
+    const firstPx = Math.round(s.firstIndent / 75);
+    let padLeft = leftPx;
+    let textIndent = firstPx;
+    if (firstPx < 0) {
+      const need = -firstPx;
+      if (need > padLeft) padLeft = need;
+    }
+    if (padLeft > 0)     p.push(`padding-left:${padLeft}px`);
+    if (textIndent !== 0) p.push(`text-indent:${textIndent}px`);
   }
-  if (s.indent !== 0 && s.indent != null) {
-    const px = Math.round(s.indent / 75); if (px !== 0) p.push(`text-indent:${px}px`);
+  if (s.prev > 0) {
+    const px = Math.round(s.prev / 75);
+    if (px > 0) p.push(`margin-top:${px}px`);
   }
-  if (s.lineSpacing > 0 && s.lineSpacingType === 'RATIO')
-    p.push(`line-height:${(s.lineSpacing/100).toFixed(2)}`);
+  if (s.next > 0) {
+    const px = Math.round(s.next / 75);
+    if (px > 0) p.push(`margin-bottom:${px}px`);
+  }
+
+  if (s.lineSpacing > 0) {
+    const type = s.lineSpacingType;
+    if (type === 'PERCENT' || type === 'RATIO') {
+      p.push(`line-height:${(s.lineSpacing / 100).toFixed(2)}`);
+    } else if (type === 'FIXED' || type === 'AT_LEAST') {
+      const px = Math.round(s.lineSpacing / 75);
+      if (px > 0) p.push(`line-height:${px}px`);
+    } else if (type === 'BETWEEN_LINES') {
+      // 줄 사이 간격 (pt 단위 + 글자 높이)
+      const pt = s.lineSpacing / 100;
+      if (pt > 0) p.push(`line-height:calc(1em + ${pt}pt)`);
+    }
+  }
+
+  if (s.pageBreakBefore) p.push('page-break-before:always');
+
   return p.join(';');
+}
+
+function borderFillToCSS(id) {
+  if (!id) return '';
+  const bf = gStyles.borderFills.get(String(id));
+  if (!bf) return '';
+  const parts = [
+    `border-left:${borderSideCSS(bf.left)}`,
+    `border-right:${borderSideCSS(bf.right)}`,
+    `border-top:${borderSideCSS(bf.top)}`,
+    `border-bottom:${borderSideCSS(bf.bottom)}`,
+  ];
+  if (bf.fillColor) parts.push(`background-color:${bf.fillColor}`);
+  return parts.join(';');
 }
 
 /* =============================================================
@@ -516,28 +1156,46 @@ function renderRun(run) {
   for (const c of run.childNodes) {
     if (c.nodeType !== Node.ELEMENT_NODE) continue;
     const cn = localName(c);
-    if (cn === 't') parts.push(escapeHtml(c.textContent || ''));
+    if      (cn === 't')         parts.push(escapeHtml(c.textContent || ''));
     else if (cn === 'lineBreak') parts.push('<br>');
   }
   const html = parts.join('');
   if (!html) return '';
-  const style = charShapeToStyle(run.getAttribute('charShapeId'));
+  const style = charShapeToStyle(run.getAttribute('charPrIDRef'));
   return style ? `<span style="${style}">${html}</span>` : html;
 }
 
-function renderCellContent(tc) {
-  const pNodes = descendants(tc, 'p');
+function renderCellContent(tc, sectionIdx, parentTcIdx) {
+  // subList > p 순서로 렌더링. 각 p를 별도 [data-xml-idx]로 등록 → 셀 안 단일 문단 선택 가능
+  const subList = directChildren(tc, 'subList')[0];
+  const pNodes  = subList ? directChildren(subList, 'p') : descendants(tc, 'p');
   if (!pNodes.length) return escapeHtml(normalizeText(textFromNode(tc)));
+
   return pNodes.map(p => {
     const runs = Array.from(p.childNodes).filter(
-      c => c.nodeType === Node.ELEMENT_NODE && (localName(c) === 'run' || localName(c) === 'r')
+      c => c.nodeType === Node.ELEMENT_NODE && localName(c) === 'run'
     );
+    let bodyHtml;
+    let plain;
     if (!runs.length) {
-      const t = normalizeText(textFromNode(p));
-      return t ? escapeHtml(t) : '';
+      plain = normalizeText(textFromNode(p));
+      bodyHtml = plain ? escapeHtml(plain) : '';
+    } else {
+      const inner = runs.map(renderRun).join('');
+      const pStyle = parShapeToStyle(p.getAttribute('paraPrIDRef'));
+      bodyHtml = pStyle ? `<span style="${pStyle}">${inner}</span>` : inner;
+      plain = normalizeText(runs.flatMap(run =>
+        Array.from(run.childNodes)
+          .filter(c => c.nodeType === Node.ELEMENT_NODE && localName(c) === 't')
+          .map(c => c.textContent || '')
+      ).join(''));
     }
-    return runs.map(renderRun).join('');
-  }).filter(Boolean).join('<br>');
+    if (!bodyHtml) return '';
+
+    const xmlIdx = state.xmlNodeMap.length;
+    state.xmlNodeMap.push({ type: 'p', node: p, sectionIdx, parentTcIdx });
+    return `<p class="p p-in-cell" data-xml-idx="${xmlIdx}" data-tag-text="${escapeHtml(plain)}">${bodyHtml}</p>`;
+  }).filter(Boolean).join('');
 }
 
 function attrInt(el, name, fallback) {
@@ -553,13 +1211,29 @@ function renderTable(tbl, sectionIdx) {
       const colSpan = attrInt(span, 'colSpan', 1);
       const rowSpan = attrInt(span, 'rowSpan', 1);
       const plain   = normalizeText(textFromNode(tc));
-      const cellHtml = renderCellContent(tc);
 
+      // borderFill 적용
+      const bfCss = borderFillToCSS(tc.getAttribute('borderFillIDRef'));
+
+      // cellMargin → padding
+      const margin = directChildren(tc, 'cellMargin')[0];
+      let padCss = 'padding:4px 6px';
+      if (margin) {
+        const l = Math.max(2, Math.round(attrInt(margin, 'left',   141) / 75));
+        const r = Math.max(2, Math.round(attrInt(margin, 'right',  141) / 75));
+        const t = Math.max(2, Math.round(attrInt(margin, 'top',    141) / 75));
+        const b = Math.max(2, Math.round(attrInt(margin, 'bottom', 141) / 75));
+        padCss = `padding:${t}px ${r}px ${b}px ${l}px`;
+      }
+
+      const style = [bfCss, padCss, 'vertical-align:middle'].filter(Boolean).join(';');
+      // 셀을 먼저 등록 → 셀 xmlIdx < 셀 안 문단 xmlIdx (정렬·dedup 용이)
       const xmlIdx = state.xmlNodeMap.length;
       state.xmlNodeMap.push({ type: 'tc', node: tc, sectionIdx });
+      const cellHtml = renderCellContent(tc, sectionIdx, xmlIdx);
 
       return `<td class="hcell" colspan="${colSpan}" rowspan="${rowSpan}" ` +
-             `data-xml-idx="${xmlIdx}" data-tag-text="${escapeHtml(plain)}">${cellHtml || '&nbsp;'}</td>`;
+             `style="${style}" data-xml-idx="${xmlIdx}" data-tag-text="${escapeHtml(plain)}">${cellHtml || '&nbsp;'}</td>`;
     }).join('');
     return `<tr>${cells}</tr>`;
   }).join('');
@@ -567,103 +1241,231 @@ function renderTable(tbl, sectionIdx) {
 }
 
 function renderParagraph(p, sectionIdx) {
-  const tables = descendants(p, 'tbl');
-  if (tables.length) return tables.map(tbl => renderTable(tbl, sectionIdx)).join('');
-
-  const runs = Array.from(p.childNodes).filter(
-    c => c.nodeType === Node.ELEMENT_NODE && (localName(c) === 'run' || localName(c) === 'r')
+  const runEls = Array.from(p.childNodes).filter(
+    c => c.nodeType === Node.ELEMENT_NODE && localName(c) === 'run'
   );
 
-  let bodyHtml, plain;
-  if (runs.length) {
-    bodyHtml = runs.map(renderRun).join('');
-    plain = normalizeText(runs.flatMap(run =>
-      Array.from(run.childNodes)
-        .filter(c => c.nodeType === Node.ELEMENT_NODE && localName(c) === 't')
-        .map(c => c.textContent || '')
-    ).join(''));
-  } else {
-    plain    = normalizeText(textFromNode(p));
-    bodyHtml = escapeHtml(plain);
+  // run 안에 tbl이 있으면 혼재 단락: 순서대로 테이블/텍스트 렌더
+  const hasTbl = runEls.some(run => directChildren(run, 'tbl').length > 0);
+  if (hasTbl) {
+    return runEls.map(run => {
+      const tbl = directChildren(run, 'tbl')[0];
+      return tbl ? renderTable(tbl, sectionIdx) : renderRun(run);
+    }).join('');
   }
+
+  // 순수 텍스트 단락
+  const bodyHtml = runEls.map(renderRun).join('');
+  const plain = normalizeText(runEls.flatMap(run =>
+    Array.from(run.childNodes)
+      .filter(c => c.nodeType === Node.ELEMENT_NODE && localName(c) === 't')
+      .map(c => c.textContent || '')
+  ).join(''));
 
   if (!plain && !bodyHtml.includes('<br')) return '<p class="p">&nbsp;</p>';
 
   const xmlIdx = state.xmlNodeMap.length;
-  state.xmlNodeMap.push({ type: 'p', node: p, sectionIdx });
+  state.xmlNodeMap.push({ type: 'p', node: p, sectionIdx, parentTcIdx: -1 });
 
-  const parStyle  = parShapeToStyle(p.getAttribute('parShapeId'));
+  const parStyle  = parShapeToStyle(p.getAttribute('paraPrIDRef'));
   const styleAttr = parStyle ? ` style="${parStyle}"` : '';
   return `<p class="p"${styleAttr} data-xml-idx="${xmlIdx}" data-tag-text="${escapeHtml(plain)}">${bodyHtml || '&nbsp;'}</p>`;
 }
 
 function renderHwpx() {
   state.xmlNodeMap = [];
+
+  // 첫 번째 섹션에서 pagePr 읽어 .doc 스타일 결정
+  let docStyle = '';
+  if (state.xmlSections.length > 0) {
+    const pagePrEls = descendants(state.xmlSections[0].doc.documentElement, 'pagePr');
+    if (pagePrEls.length) {
+      const pagePr  = pagePrEls[0];
+      const pageW   = parseInt(pagePr.getAttribute('width')  || '0') || 0;
+      const marginEl = directChildren(pagePr, 'margin')[0];
+      if (pageW > 0 && marginEl) {
+        const mL = parseInt(marginEl.getAttribute('left')   || '7086') || 7086;
+        const mR = parseInt(marginEl.getAttribute('right')  || '7086') || 7086;
+        const mT = parseInt(marginEl.getAttribute('top')    || '4251') || 4251;
+        const mB = parseInt(marginEl.getAttribute('bottom') || '3401') || 3401;
+        const W  = Math.round(pageW / 75);
+        const pL = Math.round(mL / 75);
+        const pR = Math.round(mR / 75);
+        const pT = Math.round(mT / 75);
+        const pB = Math.round(mB / 75);
+        docStyle = `max-width:${W}px;padding:${pT}px ${pR}px ${pB}px ${pL}px;`;
+      }
+    }
+  }
+
   const body = state.xmlSections.map(({ doc }, sectionIdx) => {
     const root = doc.documentElement;
     return directChildren(root, 'p').map(p => renderParagraph(p, sectionIdx)).join('');
   }).join('');
 
-  $('viewer-shell').innerHTML = `<div class="doc" id="doc">${body ||
+  $('viewer-shell').innerHTML = `<div class="doc" id="doc"${docStyle ? ` style="${docStyle}"` : ''}>${body ||
     '<div class="drop"><strong>표시할 본문을 찾지 못했습니다</strong></div>'}</div>`;
   bindDocumentPicking();
+  applyTagHighlights();
+}
+
+// 한 element를 unit으로 변환
+// 셀 안 단일 문단을 선택한 경우 → 자동으로 그 셀(tc)로 승격 (단일 문단 셀은 셀과 문단이 사실상 동치)
+function elementToUnit(el) {
+  if (!el) return null;
+  let xmlIdx = parseInt(el.dataset.xmlIdx ?? '-1');
+  if (xmlIdx < 0) return null;
+  let info = state.xmlNodeMap[xmlIdx];
+  if (!info) return null;
+
+  // p-in-cell 승격
+  if (info.type === 'p' && info.parentTcIdx >= 0 && el.classList.contains('p-in-cell')) {
+    const td = el.closest('td.hcell');
+    if (td && td.querySelectorAll('p.p-in-cell').length === 1) {
+      const tdIdx = parseInt(td.dataset.xmlIdx ?? '-1');
+      const tdInfo = tdIdx >= 0 ? state.xmlNodeMap[tdIdx] : null;
+      if (tdInfo) {
+        el = td;
+        xmlIdx = tdIdx;
+        info = tdInfo;
+      }
+    }
+  }
+
+  const rawText = el.textContent || el.dataset.tagText || '';
+  const text    = normalizeText(rawText);
+  if (!text) return null;
+  return { type: info.type, xmlIdx, text, rawText, sectionIdx: info.sectionIdx };
+}
+
+// 표를 통째로 → 셀 단위 unit 배열
+function tableToUnits(tableEl) {
+  const cells = Array.from(tableEl.querySelectorAll('td.hcell[data-xml-idx]'));
+  return cells.map(elementToUnit).filter(Boolean);
+}
+
+// 선택 범위 → unit 배열
+//   규칙:
+//   - 표 외 문단: 각각 unit
+//   - 단일 셀 안에서 단일 문단만 교차 → 그 문단 unit
+//   - 단일 셀 안에서 여러 문단 교차 → 그 셀 unit (셀 통째)
+//   - 여러 셀 교차 (한 표 안) → 표 전체 (모든 셀 unit)
+//   - 표를 벗어나 표 바깥과 같이 교차 → 그 표는 통째로
+function rangeToUnits(range) {
+  const doc = $('doc');
+  const all = Array.from(doc.querySelectorAll('[data-xml-idx]'));
+  const inSel = all.filter(el => range.intersectsNode(el));
+  if (inSel.length === 0) return [];
+
+  // 표별 그룹: tableEl -> Map<td, Set<p>>
+  const tableMap = new Map();
+  const looseUnits = [];
+  for (const el of inSel) {
+    const tbl = el.closest('table.htable');
+    if (!tbl) {
+      // 표 바깥 단락
+      const u = elementToUnit(el);
+      if (u) looseUnits.push(u);
+      continue;
+    }
+    if (!tableMap.has(tbl)) tableMap.set(tbl, new Map());
+    const cellMap = tableMap.get(tbl);
+    if (el.tagName === 'TD') {
+      if (!cellMap.has(el)) cellMap.set(el, new Set());
+    } else if (el.tagName === 'P' && el.classList.contains('p-in-cell')) {
+      const td = el.closest('td.hcell');
+      if (td) {
+        if (!cellMap.has(td)) cellMap.set(td, new Set());
+        cellMap.get(td).add(el);
+      }
+    }
+  }
+
+  const tableUnits = [];
+  for (const [tbl, cellMap] of tableMap) {
+    // 표 바깥 ↔ 표 안 가로지르는 드래그 → 표 전체
+    const startInTbl = tbl.contains(range.startContainer);
+    const endInTbl   = tbl.contains(range.endContainer);
+    const crossesTbl = !startInTbl || !endInTbl;
+    // 셀이 2개 이상 → 표 전체
+    if (cellMap.size > 1 || crossesTbl) {
+      tableUnits.push(...tableToUnits(tbl));
+      continue;
+    }
+    const [td, pSet] = [...cellMap.entries()][0];
+    // 단일 셀 안: 문단 1개만 → 그 문단, 그 외 → 셀
+    if (pSet.size === 1) {
+      // 단, 범위가 그 문단 밖 (셀 패딩 등)으로 뻗으면 셀
+      const onlyP = [...pSet][0];
+      const startIn = onlyP.contains(range.startContainer);
+      const endIn   = onlyP.contains(range.endContainer);
+      if (startIn && endIn) {
+        const u = elementToUnit(onlyP);
+        if (u) tableUnits.push(u);
+      } else {
+        const u = elementToUnit(td);
+        if (u) tableUnits.push(u);
+      }
+    } else {
+      // 0개(셀 패딩만 클릭) 또는 2개 이상 → 셀
+      const u = elementToUnit(td);
+      if (u) tableUnits.push(u);
+    }
+  }
+
+  return [...looseUnits, ...tableUnits];
 }
 
 function bindDocumentPicking() {
   const doc = $('doc');
   if (!doc) return;
 
+  // 클릭: 단일 문단/셀 → 단일 unit
   doc.addEventListener('click', event => {
     if (!state.activeId) return;
+    // 드래그가 발생한 직후의 click 이벤트는 mouseup에서 이미 처리됨 → 무시
+    const sel = window.getSelection();
+    if (sel && !sel.isCollapsed) return;
     const target = event.target.closest('[data-xml-idx]');
     if (!target) return;
-    const xmlIdx = parseInt(target.dataset.xmlIdx ?? '-1');
-    setTaggedValue(target.dataset.tagText || target.textContent, xmlIdx);
+    // closest는 가장 가까운 조상 → 셀 안 클릭은 자연스레 p가 우선됨
+    // 셀 패딩(문단 외부) 클릭 시 td 우선
+    const u = elementToUnit(target);
+    if (u) applyUnits(state.activeId, [u]);
   });
 
+  // 드래그: 범위 → 여러 unit (표 전체 확장 포함)
   doc.addEventListener('mouseup', () => {
     if (!state.activeId) return;
-    const sel  = window.getSelection();
-    const text = normalizeText(sel?.toString() || '');
-    if (!text) return;
-
-    let xmlIdx = -1;
-    if (sel.rangeCount > 0) {
-      const range     = sel.getRangeAt(0);
-      const container = range.commonAncestorContainer;
-      const el  = container.nodeType === Node.TEXT_NODE ? container.parentElement : container;
-      const xmlEl = el?.closest('[data-xml-idx]');
-      if (xmlEl) xmlIdx = parseInt(xmlEl.dataset.xmlIdx ?? '-1');
-    }
-
-    markSelection(sel);
-    setTaggedValue(text, xmlIdx);
+    const sel = window.getSelection();
+    if (!sel || sel.isCollapsed || sel.rangeCount === 0) return;
+    const range  = sel.getRangeAt(0);
+    if (!doc.contains(range.commonAncestorContainer)) { sel.removeAllRanges(); return; }
+    const units  = rangeToUnits(range);
     sel.removeAllRanges();
+    if (units.length) applyUnits(state.activeId, units);
   });
 }
 
-function markSelection(sel) {
-  if (!sel || sel.rangeCount === 0) return;
-  const range = sel.getRangeAt(0);
-  const doc   = $('doc');
-  if (!doc || !doc.contains(range.commonAncestorContainer)) return;
-  try {
-    const span = document.createElement('span');
-    span.className = 'selected-fragment';
-    range.surroundContents(span);
-  } catch {
-    const span = document.createElement('span');
-    span.className = 'selected-fragment';
-    span.textContent = sel.toString();
-    range.deleteContents();
-    range.insertNode(span);
+/* =============================================================
+   하이라이트 — 단락/셀 단위 .tagged-unit 클래스
+============================================================= */
+function applyTagHighlights() {
+  const doc = $('doc');
+  if (!doc) return;
+  for (const tagId of Object.keys(state.tagLocations)) {
+    for (const unit of getUnits(tagId)) {
+      if (unit.xmlIdx < 0) continue;
+      const el = doc.querySelector(`[data-xml-idx="${unit.xmlIdx}"]`);
+      if (el) el.classList.add('tagged-unit');
+    }
   }
 }
 
 /* =============================================================
    HWPX fieldBegin / fieldEnd 삽입 (OWPML 표준 필드)
 ============================================================= */
-function insertFieldInParagraph(xmlDoc, pNode, taggedText, tagId, label, fieldId, strict = false) {
+function insertFieldInParagraph(xmlDoc, pNode, taggedText, fieldName, direction, fieldId, metaPayload, strict = false) {
   // 직접 자식 run 요소와 텍스트 수집 (ctrl run 등 텍스트 없는 run 제외)
   const runData = [];
   for (const child of pNode.childNodes) {
@@ -702,7 +1504,7 @@ function insertFieldInParagraph(xmlDoc, pNode, taggedText, tagId, label, fieldId
     const fb   = mk('fieldBegin');
     fb.setAttribute('id',       String(fieldId));
     fb.setAttribute('type',     'CLICK_HERE');
-    fb.setAttribute('name',     tagId);
+    fb.setAttribute('name',     fieldName);
     fb.setAttribute('editable', '1');
     fb.setAttribute('dirty',    '0');
     fb.setAttribute('zorder',   '0');
@@ -712,7 +1514,7 @@ function insertFieldInParagraph(xmlDoc, pNode, taggedText, tagId, label, fieldId
     const params   = mk('parameters');
     const dirParam = mk('stringParam');
     dirParam.setAttribute('name', 'Direction');
-    dirParam.textContent = label;
+    dirParam.textContent = direction;
     const helpParam = mk('stringParam');
     helpParam.setAttribute('name', 'HelpState');
     helpParam.textContent = '';
@@ -722,7 +1524,7 @@ function insertFieldInParagraph(xmlDoc, pNode, taggedText, tagId, label, fieldId
 
     // 태깅 메타데이터 보존
     const mt = mk('metaTag');
-    mt.textContent = JSON.stringify({ schema: 'agenda-tagging/v1', tagId, label });
+    mt.textContent = JSON.stringify(metaPayload || { schema: 'agenda-tagging/v1', name: fieldName });
     fb.appendChild(mt);
 
     ctrl.appendChild(fb);
@@ -853,10 +1655,7 @@ async function exportHwpx() {
   if (!state.fileName || !Object.keys(state.rawEntries).length) {
     setStatus('먼저 HWPX 파일을 열어주세요.'); return;
   }
-  const toExport = TAGS.filter(t => {
-    const loc = state.tagLocations[t.id];
-    return loc && loc.text;
-  });
+  const toExport = TAGS.filter(t => getUnits(t.id).length > 0);
   if (toExport.length === 0) {
     setStatus('HWPX에 삽입할 태그가 없습니다. (문단/셀 클릭 또는 드래그로 태깅하세요.)'); return;
   }
@@ -872,48 +1671,52 @@ async function exportHwpx() {
       doc: parser.parseFromString(serializer.serializeToString(doc), 'application/xml'),
     }));
 
-    let fieldId = (Math.floor(Date.now() / 1000) % 0x7FFFFFFF) + 1;
+    let fieldId       = (Math.floor(Date.now() / 1000) % 0x7FFFFFFF) + 1;
+    let totalInserted = 0;
+
+    // 단위(unit)별 단일 문단 삽입 — type='p'면 그 문단, type='tc'면 그 셀의 첫 텍스트 문단
+    function insertUnit(unit, fieldName, direction, fieldId, metaPayload) {
+      const info = state.xmlNodeMap[unit.xmlIdx];
+      if (!info) return false;
+      const { type, node, sectionIdx } = info;
+      const workDoc  = workSections[sectionIdx].doc;
+      const workNode = getNodeAtPath(workDoc.documentElement, getNodePath(node));
+      if (!workNode) return false;
+
+      if (type === 'p') {
+        return insertFieldInParagraph(workDoc, workNode, unit.text, fieldName, direction, fieldId, metaPayload, false);
+      }
+      // tc: 셀 안의 첫 비어있지 않은 문단에 삽입
+      const pEls = Array.from(workNode.getElementsByTagName('*')).filter(e => localName(e) === 'p');
+      for (const p of pEls) {
+        if (insertFieldInParagraph(workDoc, p, unit.text, fieldName, direction, fieldId, metaPayload, false)) return true;
+      }
+      // 폴백: 첫 문단에 강제 래핑 시도
+      if (pEls.length) {
+        return insertFieldInParagraph(workDoc, pEls[0], unit.text, fieldName, direction, fieldId, metaPayload, false);
+      }
+      return false;
+    }
 
     for (const tag of toExport) {
-      const loc      = state.tagLocations[tag.id];
-      const nodeInfo = loc.xmlIdx >= 0 ? state.xmlNodeMap[loc.xmlIdx] : null;
-
-      let inserted = false;
-
-      if (nodeInfo) {
-        const { type, node, sectionIdx } = nodeInfo;
-        const workDoc  = workSections[sectionIdx].doc;
-
-        // 원본 노드 경로로 복사본 doc의 동등 노드 탐색
-        const path     = getNodePath(node);
-        const workNode = getNodeAtPath(workDoc.documentElement, path);
-        if (workNode) {
-          if (type === 'p') {
-            inserted = insertFieldInParagraph(workDoc, workNode, loc.text, tag.id, tag.label, fieldId, true);
-          } else if (type === 'tc') {
-            const pEls = Array.from(workNode.getElementsByTagName('*')).filter(e => localName(e) === 'p');
-            for (const p of pEls) {
-              inserted = insertFieldInParagraph(workDoc, p, loc.text, tag.id, tag.label, fieldId, true);
-              if (inserted) break;
-            }
-          }
-        }
-      }
-
-      // xmlIdx=-1이거나 경로 탐색 실패 시: 전체 문서에서 텍스트 검색
-      if (!inserted) {
-        for (const { doc: workDoc } of workSections) {
-          const allP = Array.from(workDoc.getElementsByTagName('*')).filter(e => localName(e) === 'p');
-          for (const p of allP) {
-            inserted = insertFieldInParagraph(workDoc, p, loc.text, tag.id, tag.label, fieldId, true);
-            if (inserted) break;
-          }
-          if (inserted) break;
-        }
-      }
-
-      if (inserted) fieldId++;
-      else console.warn(`태그 ${tag.id}: 텍스트 위치 탐색 실패 — "${loc.text}"`);
+      const units = getUnits(tag.id).slice().sort((a, b) => a.xmlIdx - b.xmlIdx);
+      const partCount = units.length;
+      units.forEach((unit, i) => {
+        const partIndex = i + 1;
+        const fieldName = `${tag.id}_${partIndex}`;
+        const direction = partCount > 1 ? `${tag.label} (${partIndex}/${partCount})` : tag.label;
+        const metaPayload = {
+          schema:    'agenda-tagging/v1',
+          tagId:     tag.id,
+          label:     tag.label,
+          partIndex,
+          partCount,
+          unitType:  unit.type,            // 'p' = 문단, 'tc' = 셀
+        };
+        const ok = insertUnit(unit, fieldName, direction, fieldId, metaPayload);
+        if (ok) { totalInserted++; fieldId++; }
+        else console.warn(`태그 ${fieldName}: 삽입 실패 — "${unit.text}"`);
+      });
     }
 
     // 수정된 section XML → UTF-8 바이트
@@ -943,7 +1746,7 @@ async function exportHwpx() {
     document.body.appendChild(a); a.click(); a.remove();
     URL.revokeObjectURL(url);
 
-    setStatus(`HWPX 저장 완료 — 필드 ${fieldId - 1}개 삽입됨`, 'ready');
+    setStatus(`HWPX 저장 완료 — 필드 ${totalInserted}개 삽입됨`, 'ready');
   } catch (err) {
     console.error(err);
     setStatus('HWPX 저장 중 오류: ' + err.message);
@@ -965,7 +1768,7 @@ async function loadHwpx(file) {
   const parser  = new DOMParser();
 
   // header.xml 스타일 로드
-  gStyles = { charShapes: new Map(), parShapes: new Map() };
+  gStyles = { charShapes: new Map(), parShapes: new Map(), borderFills: new Map(), hangulFonts: new Map(), latinFonts: new Map() };
   const headerKey = Object.keys(entries).find(n => /header\.xml$/i.test(n));
   if (headerKey) {
     try {
@@ -987,7 +1790,7 @@ async function loadHwpx(file) {
   });
 
   renderHwpx();
-  setStatus(`${file.name} 렌더링 완료 (글자체 ${gStyles.charShapes.size}개 적용)`, 'ready');
+  setStatus(`${file.name} 렌더링 완료 (charPr ${gStyles.charShapes.size}개 · borderFill ${gStyles.borderFills.size}개)`, 'ready');
 }
 
 async function handleFile(file) {
@@ -1000,56 +1803,350 @@ async function handleFile(file) {
 /* =============================================================
    태그 UI
 ============================================================= */
+function unitsPreviewHtml(tagId, units) {
+  if (!units.length) return '아직 태그된 텍스트가 없습니다.';
+  const headerText = `${units.length}개 항목 (문단/셀 단위)`;
+  const list = `<ol class="tag-units">${units.map((u, i) => {
+    const chip = u.type === 'tc'
+      ? '<span class="unit-chip t-tc">셀</span>'
+      : '<span class="unit-chip t-p">문단</span>';
+    return `<li><span class="num">${i + 1}.</span>${chip}<span class="txt">${escapeHtml(u.text)}</span></li>`;
+  }).join('')}</ol>`;
+  if (units.length <= UNITS_COLLAPSE_THRESHOLD) {
+    return `<div class="units-header">${headerText}</div>${list}`;
+  }
+  const isOpen = state.expanded.has(tagId);
+  return `<details class="units-collapse" data-tag="${tagId}"${isOpen ? ' open' : ''}>
+    <summary>${headerText}</summary>
+    ${list}
+  </details>`;
+}
+
 function renderTags() {
   $('tag-list').innerHTML = TAGS.map(tag => {
-    const value = state.values[tag.id];
-    return `<article class="tag-item ${state.activeId === tag.id ? 'active' : ''}">
+    const units    = getUnits(tag.id);
+    const isActive = state.activeId === tag.id;
+    const hasUnits = units.length > 0;
+
+    let actionsHtml;
+    if (isActive) {
+      const modeLabel = state.activeMode === 'append' ? '추가 중' : '선택 중';
+      actionsHtml = `<button class="tag-select" type="button" data-action="cancel" data-tag="${tag.id}">${modeLabel}</button>`;
+    } else if (hasUnits) {
+      actionsHtml = `
+        <div class="tag-actions">
+          <button class="btn-warn" type="button" data-action="clear"  data-tag="${tag.id}">초기화</button>
+          <button             type="button" data-action="append" data-tag="${tag.id}">추가</button>
+        </div>`;
+    } else {
+      actionsHtml = `<button class="tag-select" type="button" data-action="select" data-tag="${tag.id}">선택</button>`;
+    }
+
+    return `<article class="tag-item ${isActive ? 'active' : ''}">
       <div class="tag-top">
         <div class="tag-name">${escapeHtml(tag.label)}</div>
-        <button class="tag-select" type="button" data-pick="${tag.id}">
-          ${state.activeId === tag.id ? '선택 중' : '선택'}
-        </button>
+        ${actionsHtml}
       </div>
-      <div class="tag-value ${value ? 'filled' : ''}">
-        ${value ? escapeHtml(value) : '아직 태그된 텍스트가 없습니다.'}
+      <div class="tag-value ${hasUnits ? 'filled' : ''}">
+        ${unitsPreviewHtml(tag.id, units)}
       </div>
     </article>`;
   }).join('');
 
-  $('tag-list').querySelectorAll('[data-pick]').forEach(btn => {
-    btn.addEventListener('click', () => activateTag(btn.dataset.pick));
+  $('tag-list').querySelectorAll('[data-action]').forEach(btn => {
+    btn.addEventListener('click', () => handleTagAction(btn.dataset.action, btn.dataset.tag));
   });
 
-  const filled = Object.values(state.values).filter(Boolean).length;
+  $('tag-list').querySelectorAll('details.units-collapse').forEach(d => {
+    d.addEventListener('toggle', () => {
+      const tagId = d.dataset.tag;
+      if (d.open) state.expanded.add(tagId);
+      else        state.expanded.delete(tagId);
+    });
+  });
+
+  const filled = TAGS.filter(t => getUnits(t.id).length > 0).length;
   $('tag-count').textContent = `${filled} / ${TAGS.length}`;
 }
 
-function activateTag(id) {
-  state.activeId = state.activeId === id ? null : id;
+function handleTagAction(action, tagId) {
+  switch (action) {
+    case 'select':
+      state.activeId   = tagId;
+      state.activeMode = 'replace';
+      break;
+    case 'append':
+      state.activeId   = tagId;
+      state.activeMode = 'append';
+      break;
+    case 'cancel':
+      state.activeId   = null;
+      state.activeMode = 'replace';
+      break;
+    case 'clear':
+      setUnits(tagId, []);
+      state.expanded.delete(tagId);
+      state.activeId   = null;
+      state.activeMode = 'replace';
+      if (state.xmlSections.length) renderHwpx();
+      break;
+  }
   $('hint').classList.toggle('on', Boolean(state.activeId));
   renderTags();
 }
 
-function setTaggedValue(value, xmlIdx) {
-  if (xmlIdx === undefined) xmlIdx = -1;
-  const text = normalizeText(value);
-  if (!state.activeId || !text) return;
-  state.values[state.activeId]       = text;
-  state.tagLocations[state.activeId] = { xmlIdx, text };
-  state.activeId = null;
+function applyUnits(tagId, newUnits) {
+  if (!newUnits.length) return;
+  let units = state.activeMode === 'append' ? getUnits(tagId).slice() : [];
+  // 1차: xmlIdx 중복 제거
+  const seen = new Set(units.map(u => u.xmlIdx));
+  for (const u of newUnits) {
+    if (u.xmlIdx >= 0 && !seen.has(u.xmlIdx)) {
+      units.push(u);
+      seen.add(u.xmlIdx);
+    }
+  }
+  // 2차: 셀(tc)이 선택되어 있으면 그 셀에 속한 문단(p)은 제거 (포함 관계 dedup)
+  const selectedTcIdx = new Set(units.filter(u => u.type === 'tc').map(u => u.xmlIdx));
+  if (selectedTcIdx.size) {
+    units = units.filter(u => {
+      if (u.type !== 'p') return true;
+      const info = state.xmlNodeMap[u.xmlIdx];
+      return !(info && info.parentTcIdx >= 0 && selectedTcIdx.has(info.parentTcIdx));
+    });
+  }
+  // doc order = xmlIdx order (xmlNodeMap built in DOM order)
+  units.sort((a, b) => a.xmlIdx - b.xmlIdx);
+  setUnits(tagId, units);
+  state.activeId   = null;
+  state.activeMode = 'replace';
   $('hint').classList.remove('on');
+  if (state.xmlSections.length) renderHwpx();
   renderTags();
-  setStatus('태그값을 저장했습니다.', 'ready');
+  setStatus(`태그 영역 ${units.length}개를 저장했습니다.`, 'ready');
 }
+
+/* =============================================================
+   표준 항목 관리 (헤더 / 수정 / 이력 / JSON IO)
+============================================================= */
+function renderStandardBar() {
+  $('standard-date').textContent = STANDARD.standardDate || '-';
+}
+
+function applyStandard(newStd, opts) {
+  STANDARD = newStd;
+  TAGS = STANDARD.tags.map(t => ({ ...t }));
+  // 삭제된 태그의 tagLocations 정리
+  const validIds = new Set(TAGS.map(t => t.id));
+  for (const tagId of Object.keys(state.tagLocations)) {
+    if (!validIds.has(tagId)) {
+      delete state.tagLocations[tagId];
+      state.expanded.delete(tagId);
+    }
+  }
+  if (state.activeId && !validIds.has(state.activeId)) state.activeId = null;
+  saveStandard(STANDARD);
+  renderStandardBar();
+  renderTags();
+  if (opts?.silent) return;
+  setStatus(`표준 항목을 갱신했습니다 (${STANDARD.standardDate} 기준).`, 'ready');
+}
+
+// 모달 헬퍼
+function openModal(id)  { $(id).classList.add('on'); }
+function closeModal(id) { $(id).classList.remove('on'); }
+
+document.querySelectorAll('[data-close]').forEach(el => {
+  el.addEventListener('click', () => closeModal(el.dataset.close));
+});
+
+// ── 표준 수정 모달 ──
+function renderEditRows(workingTags) {
+  const html = workingTags.map((t, i) => {
+    return `<div class="edit-row ${t._removed ? 'removed' : ''}" data-idx="${i}">
+      <input class="id"    data-field="id"    type="text" value="${escapeHtml(t.id)}"    placeholder="영문 ID (예: companyName)">
+      <input class="label" data-field="label" type="text" value="${escapeHtml(t.label)}" placeholder="표시 이름">
+      <button class="row-del" type="button" data-toggle-del="${i}">${t._removed ? '복원' : '삭제'}</button>
+    </div>`;
+  }).join('');
+  $('edit-rows').innerHTML = html || '<div class="meta" style="color:var(--muted);padding:10px 0;">항목이 없습니다. 추가하세요.</div>';
+
+  $('edit-rows').querySelectorAll('input').forEach(inp => {
+    inp.addEventListener('input', e => {
+      const row = e.target.closest('.edit-row');
+      const idx = parseInt(row.dataset.idx);
+      const field = e.target.dataset.field;
+      workingTags[idx][field] = e.target.value;
+    });
+  });
+  $('edit-rows').querySelectorAll('[data-toggle-del]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const idx = parseInt(btn.dataset.toggleDel);
+      workingTags[idx]._removed = !workingTags[idx]._removed;
+      renderEditRows(workingTags);
+    });
+  });
+}
+
+let _editState = null;
+
+function openEditModal() {
+  _editState = {
+    working: STANDARD.tags.map(t => ({ ...t, _origId: t.id, _removed: false })),
+  };
+  renderEditRows(_editState.working);
+  $('edit-standard-date').value = STANDARD.standardDate || todayISO();
+  $('edit-editor').value        = localStorage.getItem(EDITOR_STORAGE_KEY) || '';
+  $('edit-memo').value          = '';
+  openModal('edit-modal');
+}
+
+$('edit-standard-btn').addEventListener('click', openEditModal);
+
+$('add-row-btn').addEventListener('click', () => {
+  _editState.working.push({ id: '', label: '', _origId: null, _removed: false });
+  renderEditRows(_editState.working);
+});
+
+$('save-standard-btn').addEventListener('click', () => {
+  if (!_editState) return;
+  const { working } = _editState;
+
+  // 삭제 표시되지 않은 행만 유지
+  const kept = working.filter(t => !t._removed);
+
+  // 유효성 검증
+  const ids = kept.map(t => (t.id || '').trim());
+  for (const t of kept) {
+    if (!t.id || !t.id.trim())    { alert('빈 ID가 있습니다.'); return; }
+    if (!t.label || !t.label.trim()) { alert('빈 표시 이름이 있습니다: ' + t.id); return; }
+    if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(t.id.trim())) {
+      alert(`ID 형식 오류 (영문/숫자/_, 영문으로 시작): ${t.id}`); return;
+    }
+  }
+  if (new Set(ids).size !== ids.length) { alert('중복된 ID가 있습니다.'); return; }
+
+  const editor = ($('edit-editor').value || '').trim() || '(미지정)';
+  const memo   = ($('edit-memo').value || '').trim();
+  const date   = $('edit-standard-date').value || todayISO();
+  localStorage.setItem(EDITOR_STORAGE_KEY, editor);
+
+  // diff 계산 → history 엔트리
+  const prevById = new Map(STANDARD.tags.map(t => [t.id, t]));
+  const newTags  = kept.map(t => ({ id: t.id.trim(), label: t.label.trim() }));
+  const changes = [];
+
+  // 삭제: 이전엔 있었는데 새 목록에 없음
+  const newIds = new Set(newTags.map(n => n.id));
+  for (const t of STANDARD.tags) {
+    if (!newIds.has(t.id)) {
+      changes.push({ changeType: 'delete', before: { ...t }, after: null });
+    }
+  }
+  // 추가 / 수정
+  for (const n of newTags) {
+    const prev = prevById.get(n.id);
+    if (!prev) {
+      // origId가 null인 새 행 또는 ID 변경된 행 (단순화: 신규 항목으로 취급)
+      changes.push({ changeType: 'add', before: null, after: { ...n } });
+    } else if (prev.label !== n.label) {
+      changes.push({ changeType: 'modify', before: { ...prev }, after: { ...n } });
+    }
+  }
+
+  // 변경사항이 없어도 일자만 바뀌었으면 기록
+  const dateChanged = date !== STANDARD.standardDate;
+  if (changes.length === 0 && !dateChanged) {
+    alert('변경사항이 없습니다.');
+    return;
+  }
+
+  const historyEntry = {
+    timestamp:    new Date().toISOString(),
+    editor,
+    memo,
+    standardDate: date,
+    changes,
+  };
+
+  const newStd = {
+    ...STANDARD,
+    standardDate: date,
+    tags:         newTags,
+    history:      [...(STANDARD.history || []), historyEntry],
+  };
+  applyStandard(newStd);
+  closeModal('edit-modal');
+});
+
+// ── 이력 모달 ──
+function renderHistory() {
+  const list = (STANDARD.history || []).slice().reverse();
+  if (!list.length) { $('history-list').innerHTML = '<div class="meta" style="color:var(--muted);">이력이 없습니다.</div>'; return; }
+  $('history-list').innerHTML = list.map(h => {
+    const ts = h.timestamp ? new Date(h.timestamp).toLocaleString('ko-KR') : '';
+    let body;
+    if (h.changeType === 'seed') {
+      body = `<div class="chg add">초기 시드 (${(h.after || []).length}개 항목)</div>`;
+    } else {
+      body = (h.changes || []).map(c => {
+        if (c.changeType === 'add')    return `<div class="chg add">+ 추가: <b>${escapeHtml(c.after.id)}</b> — ${escapeHtml(c.after.label)}</div>`;
+        if (c.changeType === 'delete') return `<div class="chg del">− 삭제: <b>${escapeHtml(c.before.id)}</b> — ${escapeHtml(c.before.label)}</div>`;
+        if (c.changeType === 'modify') return `<div class="chg mod">~ 수정: <b>${escapeHtml(c.before.id)}</b> — "${escapeHtml(c.before.label)}" → "${escapeHtml(c.after.label)}"</div>`;
+        return '';
+      }).join('');
+    }
+    const dateLine = h.standardDate ? `<span class="by">표준일자: ${escapeHtml(h.standardDate)}</span>` : '';
+    return `<div class="row">
+      <div><span class="ts">${escapeHtml(ts)}</span><span class="by">— ${escapeHtml(h.editor || '')}</span>${dateLine}</div>
+      ${h.memo ? `<div class="memo">${escapeHtml(h.memo)}</div>` : ''}
+      ${body}
+    </div>`;
+  }).join('');
+}
+
+$('history-btn').addEventListener('click', () => { renderHistory(); openModal('history-modal'); });
+$('help-btn').addEventListener('click',    () => openModal('help-modal'));
+
+// ── JSON IO ──
+$('export-std-btn').addEventListener('click', () => {
+  const blob = new Blob([JSON.stringify(STANDARD, null, 2)], { type: 'application/json;charset=utf-8' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = `agenda-tagging-standard_${STANDARD.standardDate}.json`;
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+});
+
+$('import-std-btn').addEventListener('click', () => $('import-std-file').click());
+
+$('import-std-file').addEventListener('change', async e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  try {
+    const text   = await file.text();
+    const parsed = JSON.parse(text);
+    if (!parsed || !Array.isArray(parsed.tags)) throw new Error('잘못된 표준 JSON 형식');
+    if (!confirm(`불러온 표준 (${parsed.standardDate || '?'} 기준, ${parsed.tags.length}개 항목)을 적용할까요? 현재 localStorage 표준이 덮어쓰입니다.`)) return;
+    applyStandard(parsed);
+    closeModal('edit-modal');
+  } catch (err) {
+    alert('표준 JSON 불러오기 실패: ' + err.message);
+  } finally {
+    e.target.value = '';
+  }
+});
 
 /* =============================================================
    초기화 / JSON 내보내기
 ============================================================= */
 function clearAll() {
   state.activeId     = null;
+  state.activeMode   = 'replace';
   state.tagLocations = {};
-  for (const tag of TAGS) state.values[tag.id] = '';
+  state.expanded.clear();
   $('hint').classList.remove('on');
+  if (state.xmlSections.length) renderHwpx();
   renderTags();
   setStatus(
     state.fileName ? `${state.fileName} 태그값을 초기화했습니다.` : '태그값을 초기화했습니다.',
@@ -1061,7 +2158,15 @@ function exportJson() {
   const payload = {
     fileName: state.fileName,
     taggedAt: new Date().toISOString(),
-    tags: Object.fromEntries(TAGS.map(tag => [tag.label, state.values[tag.id] || null])),
+    tags: Object.fromEntries(TAGS.map(tag => {
+      const units = getUnits(tag.id);
+      return [tag.label, units.length === 0 ? null : units.map((u, i) => ({
+        partIndex: i + 1,
+        partCount: units.length,
+        type:      u.type,
+        text:      u.text,
+      }))];
+    })),
   };
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json;charset=utf-8' });
   const url  = URL.createObjectURL(blob);
@@ -1089,6 +2194,7 @@ $('clear-btn').addEventListener('click', clearAll);
 $('export-json-btn').addEventListener('click', exportJson);
 $('export-hwpx-btn').addEventListener('click', exportHwpx);
 initDropZone();
+renderStandardBar();
 renderTags();
 </script>
 </body>
