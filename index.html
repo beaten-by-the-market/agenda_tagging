@@ -629,7 +629,12 @@ function findEOCD(bytes) {
   for (let i = bytes.length - 22; i >= 0; i--) {
     if (bytes[i]===0x50 && bytes[i+1]===0x4b && bytes[i+2]===0x05 && bytes[i+3]===0x06) return i;
   }
-  throw new Error('ZIP 중앙 디렉터리를 찾을 수 없습니다.');
+  // 매직 바이트 확인으로 포맷 진단
+  const magic = Array.from(bytes.slice(0, 8)).map(b => b.toString(16).padStart(2,'0')).join(' ');
+  // OLE2 compound document (구형 .hwp 바이너리)
+  if (bytes[0]===0xD0 && bytes[1]===0xCF && bytes[2]===0x11 && bytes[3]===0xE0)
+    throw new Error('확장자만 .hwpx로 되어 있을 뿐 실제 내부는 ZIP이 아닌 OLE2 컨테이너(구형 HWP 바이너리)입니다.\n한컴 오피스에서 파일을 열고 "다른 이름으로 저장 → HWPX"로 재저장해 주세요.');
+  throw new Error(`ZIP 중앙 디렉터리를 찾을 수 없습니다. (파일 헤더: ${magic})`);
 }
 const u16 = (b,o) => b[o] | (b[o+1] << 8);
 const u32 = (b,o) => (b[o] | (b[o+1]<<8) | (b[o+2]<<16) | (b[o+3]<<24)) >>> 0;
@@ -1755,38 +1760,52 @@ async function exportHwpx() {
 ============================================================= */
 async function loadHwpx(file) {
   setStatus('HWPX 파일을 읽는 중입니다.', 'busy');
-  state.fileName = file.name;
   $('doc-name').textContent = file.name;
 
   const entries = await unzipHwpx(file);
-  state.rawEntries = entries;
 
   const decoder = new TextDecoder('utf-8');
   const parser  = new DOMParser();
 
   // header.xml 스타일 로드
-  gStyles = { charShapes: new Map(), parShapes: new Map(), borderFills: new Map(), hangulFonts: new Map(), latinFonts: new Map() };
+  let newStyles = { charShapes: new Map(), parShapes: new Map(), borderFills: new Map(), hangulFonts: new Map(), latinFonts: new Map() };
   const headerKey = Object.keys(entries).find(n => /header\.xml$/i.test(n));
   if (headerKey) {
     try {
       const hDoc = parser.parseFromString(decoder.decode(entries[headerKey].data), 'application/xml');
-      if (!hDoc.querySelector('parsererror')) gStyles = parseStyles(hDoc);
+      if (!hDoc.querySelector('parsererror')) newStyles = parseStyles(hDoc);
     } catch { /* 스타일 없이 렌더링 */ }
   }
 
-  // section XML 로드
+  // section XML 로드 (Contents/sectionN.xml 또는 BodyText/sectionN.xml 양쪽 지원)
   const sectionNames = Object.keys(entries)
-    .filter(n => /^Contents\/section\d+\.xml$/i.test(n))
+    .filter(n => /^Contents\/section\d+\.xml$/i.test(n) || /^BodyText\/section\d+\.xml$/i.test(n))
     .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
-  if (!sectionNames.length) throw new Error('본문 section XML을 찾지 못했습니다.');
+  if (!sectionNames.length) {
+    const found = Object.keys(entries).filter(n => /section/i.test(n)).join(', ') || '없음';
+    throw new Error(`본문 section XML을 찾지 못했습니다. (ZIP 내 section 관련 항목: ${found})`);
+  }
 
-  state.xmlSections = sectionNames.map(name => {
+  const newXmlSections = sectionNames.map(name => {
     const doc = parser.parseFromString(decoder.decode(entries[name].data), 'application/xml');
-    if (doc.querySelector('parsererror')) throw new Error(`${name} XML 파싱에 실패했습니다.`);
+    const parseErr = doc.querySelector('parsererror');
+    if (parseErr) throw new Error(`${name} XML 파싱 실패: ${parseErr.textContent.slice(0, 120)}`);
     return { name, doc };
   });
 
+  // 모든 파싱이 성공한 후에만 state 갱신
+  gStyles               = newStyles;
+  state.fileName        = file.name;
+  state.rawEntries      = entries;
+  state.xmlSections     = newXmlSections;
+  state.tagLocations    = {};   // 새 문서 로드 시 이전 태그 초기화
+  state.expanded.clear();
+  state.activeId        = null;
+  state.activeMode      = 'replace';
+  $('hint').classList.remove('on');
+
   renderHwpx();
+  renderTags();
   setStatus(`${file.name} 렌더링 완료 (charPr ${gStyles.charShapes.size}개 · borderFill ${gStyles.borderFills.size}개)`, 'ready');
 }
 
@@ -1794,7 +1813,13 @@ async function handleFile(file) {
   if (!file) return;
   if (!/\.hwpx$/i.test(file.name)) { setStatus('HWPX 파일만 열 수 있습니다.'); return; }
   try { await loadHwpx(file); }
-  catch (err) { console.error(err); setStatus(err.message || '파일을 읽는 중 오류가 발생했습니다.'); }
+  catch (err) {
+    console.error(err);
+    $('doc-name').textContent = state.fileName || '문서 없음';
+    const msg = err.message || '파일을 읽는 중 오류가 발생했습니다.';
+    setStatus(`로드 실패: ${msg}`);
+    alert(`파일 로드 실패\n\n${msg}`);
+  }
 }
 
 /* =============================================================
@@ -2186,7 +2211,11 @@ function initDropZone() {
   });
 }
 
-$('hwpx-file').addEventListener('change', e => handleFile(e.target.files[0]));
+$('hwpx-file').addEventListener('change', e => {
+  const file = e.target.files[0];
+  e.target.value = '';  // 같은 파일을 다시 선택할 수 있도록 초기화
+  handleFile(file);
+});
 $('clear-btn').addEventListener('click', clearAll);
 $('export-json-btn').addEventListener('click', exportJson);
 $('export-hwpx-btn').addEventListener('click', exportHwpx);
