@@ -1468,12 +1468,15 @@ function applyTagHighlights() {
    HWPX fieldBegin / fieldEnd 삽입 (OWPML 표준 필드)
 ============================================================= */
 function insertFieldInParagraph(xmlDoc, pNode, taggedText, fieldName, direction, fieldId, metaPayload, strict = false) {
-  // 직접 자식 run 요소와 텍스트 수집 (ctrl run 등 텍스트 없는 run 제외)
+  // 직접 자식 run 요소와 텍스트 수집 — ctrl run(기존 fieldBegin/fieldEnd 등) 제외
+  // ctrl run을 포함하면 삽입 기준점이 기존 필드의 바깥쪽이 되어 필드가 중첩 역전됨
   const runData = [];
   for (const child of pNode.childNodes) {
     if (child.nodeType !== Node.ELEMENT_NODE) continue;
     const n = localName(child);
     if (n !== 'run' && n !== 'r') continue;
+    const isCtrl = Array.from(child.childNodes).some(c => c.nodeType === Node.ELEMENT_NODE && localName(c) === 'ctrl');
+    if (isCtrl) continue;
     let text = '';
     for (const rc of child.childNodes) {
       if (rc.nodeType === Node.ELEMENT_NODE && localName(rc) === 't')
