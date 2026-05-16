@@ -1471,8 +1471,29 @@ function applyTagHighlights() {
    HWPX fieldBegin / fieldEnd 삽입 (OWPML 표준 필드)
 ============================================================= */
 function insertFieldInParagraph(xmlDoc, pNode, taggedText, fieldName, direction, fieldId, metaPayload, strict = false) {
+  // 하이브리드 ctrl+t run 사전 분리: ctrl 자식과 t 자식이 같은 run에 있으면
+  // ctrl-only run + text-only run으로 쪼갠다.
+  // 이렇게 하지 않으면 기존 fieldBegin이 우리 fieldBegin 안에 중첩되어
+  // HWP에서 열었을 때 우리 필드 이름이 보이지 않는다.
+  for (const child of Array.from(pNode.childNodes)) {
+    if (child.nodeType !== Node.ELEMENT_NODE) continue;
+    const cn = localName(child);
+    if (cn !== 'run' && cn !== 'r') continue;
+    const hasCtrl = Array.from(child.childNodes).some(c => c.nodeType === Node.ELEMENT_NODE && localName(c) === 'ctrl');
+    const hasT    = Array.from(child.childNodes).some(c => c.nodeType === Node.ELEMENT_NODE && localName(c) === 't');
+    if (!hasCtrl || !hasT) continue;  // 순수 ctrl 또는 순수 text run은 건너뜀
+    const ctrlRun = child.cloneNode(false);  // 같은 속성, 자식 없음
+    const textRun = child.cloneNode(false);
+    for (const c of Array.from(child.childNodes)) {
+      if (c.nodeType === Node.ELEMENT_NODE && localName(c) === 'ctrl') ctrlRun.appendChild(c.cloneNode(true));
+      else textRun.appendChild(c.cloneNode(true));
+    }
+    pNode.insertBefore(ctrlRun, child);
+    pNode.insertBefore(textRun, child);
+    pNode.removeChild(child);
+  }
+
   // 직접 자식 run 요소와 텍스트 수집 — ctrl run(기존 fieldBegin/fieldEnd 등) 제외
-  // ctrl run을 포함하면 삽입 기준점이 기존 필드의 바깥쪽이 되어 필드가 중첩 역전됨
   const runData = [];
   for (const child of pNode.childNodes) {
     if (child.nodeType !== Node.ELEMENT_NODE) continue;
