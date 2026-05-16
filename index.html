@@ -1672,12 +1672,12 @@ async function exportHwpx() {
   setStatus('HWPX 필드 삽입 중...', 'busy');
 
   try {
-    // 원본 xmlSections 보호: 직렬화→재파싱으로 독립 복사본 생성
-    const parser     = new DOMParser();
+    // 원본 xmlSections 보호: cloneNode(true)로 독립 복사본 생성
+    // (직렬화→재파싱 방식은 네임스페이스 처리 차이로 getNodeAtPath 실패 가능)
     const serializer = new XMLSerializer();
     const workSections = state.xmlSections.map(({ name, doc }) => ({
       name,
-      doc: parser.parseFromString(serializer.serializeToString(doc), 'application/xml'),
+      doc: doc.cloneNode(true),
     }));
 
     let fieldId       = (Math.floor(Date.now() / 1000) % 0x7FFFFFFF) + 1;
@@ -1690,7 +1690,10 @@ async function exportHwpx() {
       const { type, node, sectionIdx } = info;
       const workDoc  = workSections[sectionIdx].doc;
       const workNode = getNodeAtPath(workDoc.documentElement, getNodePath(node));
-      if (!workNode) return false;
+      if (!workNode) {
+        console.warn(`insertUnit: getNodeAtPath 실패 — xmlIdx=${unit.xmlIdx}, path=${JSON.stringify(getNodePath(node))}`);
+        return false;
+      }
 
       if (type === 'p') {
         return insertFieldInParagraph(workDoc, workNode, unit.text, fieldName, direction, fieldId, metaPayload, false);
