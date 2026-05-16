@@ -1468,6 +1468,69 @@ function applyTagHighlights() {
 }
 
 /* =============================================================
+   태깅된 HWPX 로드 시 기존 태그 복원 (라운드트립)
+============================================================= */
+function recoverTagsFromXml() {
+  const validTagIds = new Set(TAGS.map(t => t.id));
+
+  // 역방향 맵: 원본 XML 노드 → xmlIdx
+  const nodeToIdx = new Map();
+  state.xmlNodeMap.forEach((info, idx) => nodeToIdx.set(info.node, idx));
+
+  const recovered = {};
+
+  for (const { doc } of state.xmlSections) {
+    for (const meta of descendants(doc.documentElement, 'metaTag')) {
+      let payload;
+      try { payload = JSON.parse(meta.textContent || ''); } catch { continue; }
+      if (payload?.schema !== 'agenda-tagging/v1') continue;
+      if (!validTagIds.has(payload.tagId)) continue;   // 표준에 없는 태그 무시
+
+      // metaTag 조상에서 p 또는 tc 노드 탐색
+      // tc 단위: fieldBegin은 셀 안의 <p>에 삽입되므로 tc까지 한 단계 더 올라감
+      const targetLN = payload.unitType === 'tc' ? 'tc' : 'p';
+      let anc = meta.parentNode;
+      while (anc && localName(anc) !== targetLN) anc = anc.parentNode;
+      if (!anc) continue;
+
+      const xmlIdx = nodeToIdx.get(anc);
+      if (xmlIdx === undefined) continue;
+
+      // 렌더링된 HTML 요소에서 텍스트 읽기 (정규화 포함)
+      const htmlEl = $('doc')?.querySelector(`[data-xml-idx="${xmlIdx}"]`);
+      const text = htmlEl
+        ? (normalizeText(htmlEl.textContent) || htmlEl.dataset.tagText || '')
+        : normalizeText(textFromNode(anc));
+      if (!text) continue;
+
+      const unit = {
+        type:       payload.unitType || 'p',
+        xmlIdx,
+        text,
+        rawText:    text,
+        sectionIdx: state.xmlNodeMap[xmlIdx].sectionIdx,
+      };
+      (recovered[payload.tagId] ??= []).push(unit);
+    }
+  }
+
+  // xmlIdx 기준 중복 제거 + 문서 순서 정렬
+  for (const id of Object.keys(recovered)) {
+    const seen = new Set();
+    recovered[id] = recovered[id]
+      .filter(u => seen.has(u.xmlIdx) ? false : seen.add(u.xmlIdx))
+      .sort((a, b) => a.xmlIdx - b.xmlIdx);
+  }
+
+  if (!Object.keys(recovered).length) return;
+  state.tagLocations = recovered;
+  applyTagHighlights();
+  renderTags();
+  const count = Object.values(recovered).reduce((s, a) => s + a.length, 0);
+  setStatus(`기존 태그 복원: ${count}개 항목`, 'ready');
+}
+
+/* =============================================================
    HWPX fieldBegin / fieldEnd 삽입 (OWPML 표준 필드)
 ============================================================= */
 function insertFieldInParagraph(xmlDoc, pNode, taggedText, fieldName, direction, fieldId, metaPayload, strict = false) {
@@ -1679,6 +1742,45 @@ function insertFieldInParagraph(xmlDoc, pNode, taggedText, fieldName, direction,
 }
 
 /* =============================================================
+   기존에 우리가 삽입한 필드 제거 (재내보내기 시 중복 방지)
+============================================================= */
+function stripOurFields(doc) {
+  const root = doc.documentElement;
+  const allRuns = descendants(root, 'run').concat(descendants(root, 'r'));
+  const ourIds  = new Set();
+  const toRemove = [];
+
+  // 1단계: 우리 metaTag가 있는 fieldBegin run 수집
+  for (const run of allRuns) {
+    for (const ctrl of directChildren(run, 'ctrl')) {
+      const fb = directChildren(ctrl, 'fieldBegin')[0];
+      if (!fb) continue;
+      const mt = directChildren(fb, 'metaTag')[0];
+      if (!mt) continue;
+      try {
+        const p = JSON.parse(mt.textContent || '');
+        if (p?.schema !== 'agenda-tagging/v1') continue;
+      } catch { continue; }
+      const id = fb.getAttribute('id');
+      if (id) ourIds.add(id);
+      toRemove.push(run);
+    }
+  }
+
+  // 2단계: 대응하는 fieldEnd run 수집
+  for (const run of allRuns) {
+    if (toRemove.includes(run)) continue;
+    for (const ctrl of directChildren(run, 'ctrl')) {
+      const fe = directChildren(ctrl, 'fieldEnd')[0];
+      if (!fe) continue;
+      if (ourIds.has(fe.getAttribute('beginIDRef'))) { toRemove.push(run); break; }
+    }
+  }
+
+  for (const run of toRemove) run.parentNode?.removeChild(run);
+}
+
+/* =============================================================
    HWPX 내보내기
 ============================================================= */
 async function exportHwpx() {
@@ -1700,6 +1802,9 @@ async function exportHwpx() {
       name,
       doc: doc.cloneNode(true),
     }));
+
+    // 이전 내보내기에서 삽입한 우리 필드 제거 (재태깅 시 중복 방지)
+    for (const { doc } of workSections) stripOurFields(doc);
 
     let fieldId       = (Math.floor(Date.now() / 1000) % 0x7FFFFFFF) + 1;
     let totalInserted = 0;
@@ -1838,6 +1943,7 @@ async function loadHwpx(file) {
   renderHwpx();
   renderTags();
   setStatus(`${file.name} 렌더링 완료 (charPr ${gStyles.charShapes.size}개 · borderFill ${gStyles.borderFills.size}개)`, 'ready');
+  recoverTagsFromXml();   // 이미 태깅된 파일이면 기존 태그 복원
 }
 
 async function handleFile(file) {
