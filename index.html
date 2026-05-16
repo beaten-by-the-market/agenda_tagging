@@ -599,8 +599,11 @@ function escapeHtml(v) {
 }
 
 function normalizeText(v) {
-  // \u0000 = null byte
-  return String(v ?? '').replace(/\u0000/g,'').replace(/[ \t]+/g,' ').trim();
+  return String(v ?? '')
+    .replace(/\u0000/g, '')
+    .replace(/[\u00A0\u202F\u2009\u200B\u3000]/g, ' ')
+    .replace(/[ \t]+/g, ' ')
+    .trim();
 }
 
 /* =============================================================
@@ -1475,8 +1478,9 @@ function insertFieldInParagraph(xmlDoc, pNode, taggedText, fieldName, direction,
     if (child.nodeType !== Node.ELEMENT_NODE) continue;
     const n = localName(child);
     if (n !== 'run' && n !== 'r') continue;
-    const isCtrl = Array.from(child.childNodes).some(c => c.nodeType === Node.ELEMENT_NODE && localName(c) === 'ctrl');
-    if (isCtrl) continue;
+    const hasCtrl = Array.from(child.childNodes).some(c => c.nodeType === Node.ELEMENT_NODE && localName(c) === 'ctrl');
+    const hasT    = Array.from(child.childNodes).some(c => c.nodeType === Node.ELEMENT_NODE && localName(c) === 't');
+    if (hasCtrl && !hasT) continue;  // 순수 ctrl run(fieldBegin/fieldEnd)만 제외, t도 있는 run은 포함
     let text = '';
     for (const rc of child.childNodes) {
       if (rc.nodeType === Node.ELEMENT_NODE && localName(rc) === 't')
