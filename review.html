@@ -1,0 +1,459 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HWPX 태그 요약</title>
+  <style>
+    :root {
+      --bg: #f4f6f8; --panel: #ffffff; --ink: #172033; --muted: #667085;
+      --line: #d9dee7; --soft: #eef2f7; --brand: #1266d6; --brand-dark: #0b4ba7;
+      --ok: #087443; --warn: #9a5b00; --tag: #fff2a8; --tag-line: #e2bd30;
+      --shadow: 0 10px 26px rgba(20,35,60,.09);
+    }
+    * { box-sizing: border-box; }
+    body { margin:0; min-height:100vh; background:var(--bg); color:var(--ink);
+      font-family:"Segoe UI","Malgun Gothic",Arial,sans-serif; }
+
+    .topbar { height:58px; display:flex; align-items:center; justify-content:space-between;
+      gap:16px; padding:0 20px; background:#111827; color:#fff;
+      border-bottom:1px solid rgba(255,255,255,.08); }
+    .brand { display:flex; align-items:baseline; gap:12px; min-width:0; }
+    .brand strong { font-size:17px; font-weight:800; white-space:nowrap; }
+    .brand span { color:#b9c2d1; font-size:12px; white-space:nowrap; }
+    .actions { display:flex; align-items:center; gap:8px; flex-shrink:0; }
+
+    .nav-link { color:#b9c2d1; font-size:12px; text-decoration:none; white-space:nowrap;
+      padding:6px 10px; border-radius:6px; border:1px solid rgba(255,255,255,.15); }
+    .nav-link:hover { background:rgba(255,255,255,.08); color:#fff; }
+
+    button, .file-btn {
+      border:1px solid transparent; border-radius:6px; padding:8px 11px;
+      background:var(--brand); color:#fff; font:inherit; font-weight:700;
+      font-size:13px; cursor:pointer;
+      transition:background .15s ease,transform .15s ease; white-space:nowrap;
+    }
+    button:hover, .file-btn:hover { background:var(--brand-dark); }
+    button:active, .file-btn:active { transform:translateY(1px); }
+    button.secondary { background:#fff; color:#202938; border-color:var(--line); }
+    button.secondary:hover { background:var(--soft); }
+    button.success { background:#087443; }
+    button.success:hover { background:#065c35; }
+    input[type=file] { display:none; }
+
+    .status { height:34px; display:flex; align-items:center; gap:10px; padding:0 20px;
+      background:#fff; border-bottom:1px solid var(--line); color:var(--muted); font-size:13px; }
+    .dot { width:8px; height:8px; border-radius:50%; background:#a9b2c1; flex:0 0 auto; }
+    .dot.ready { background:var(--ok); }
+    .dot.busy  { background:var(--warn); }
+
+    .main { padding:18px 20px; display:flex; flex-direction:column; gap:14px; }
+
+    .drop-area { border:2px dashed #b8c2d2; border-radius:10px; background:#f8fafc;
+      padding:36px 24px; text-align:center; color:var(--muted);
+      transition:border-color .15s, background .15s; }
+    .drop-area.over { border-color:var(--brand); background:#eef5ff; }
+    .drop-area strong { display:block; color:var(--ink); font-size:17px; margin-bottom:6px; }
+    .drop-area p { margin:6px 0 14px; font-size:13px; }
+
+    .file-chips { display:flex; flex-wrap:wrap; gap:8px; }
+    .chip { display:flex; align-items:center; gap:6px; background:#fff;
+      border:1px solid var(--line); border-radius:20px; padding:5px 8px 5px 12px; font-size:12px; }
+    .chip-name { max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .chip-meta { color:var(--muted); flex-shrink:0; }
+    .chip-remove { cursor:pointer; color:var(--muted); font-size:13px; line-height:1;
+      width:18px; height:18px; border-radius:50%; display:grid; place-items:center; flex-shrink:0; }
+    .chip-remove:hover { color:#c00; background:#fef2f2; }
+    .chip.ok { border-color:#b7e0c8; }
+    .chip.warn { border-color:#e2c2c2; background:#fdf2f2; color:#9a3a3a; }
+    .chip.no-tag { border-color:#f0d080; background:#fffdf0; color:#7a6000; }
+
+    .table-wrap { background:var(--panel); border:1px solid var(--line); border-radius:10px;
+      box-shadow:var(--shadow); overflow:auto; max-height:calc(100vh - 260px); }
+    table { width:100%; border-collapse:collapse; font-size:13px; }
+    thead th { background:#fbfcfe; border-bottom:2px solid var(--line);
+      padding:10px 14px; text-align:left; font-weight:800;
+      position:sticky; top:0; z-index:1; white-space:nowrap; }
+    thead th:first-child { min-width:200px; position:sticky; left:0; z-index:2; }
+    tbody td { padding:10px 14px; border-bottom:1px solid var(--soft); vertical-align:top; }
+    tbody tr:last-child td { border-bottom:none; }
+    tbody tr:hover td { background:#f7f9fc; }
+    td.filename { font-weight:700; white-space:nowrap; position:sticky; left:0;
+      background:#fff; border-right:1px solid var(--line); z-index:1; }
+    tbody tr:hover td.filename { background:#f7f9fc; }
+    td.tagged { background:#fbfffd; }
+    td.empty { color:#c0c8d8; text-align:center; vertical-align:middle; }
+    .cell-text { white-space:pre-wrap; line-height:1.55; max-height:120px; overflow:auto;
+      word-break:break-all; }
+
+    .empty-state { text-align:center; padding:60px 20px; color:var(--muted); font-size:14px; }
+    .empty-state strong { display:block; font-size:18px; color:var(--ink); margin-bottom:8px; }
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <strong>HWPX 태그 요약</strong>
+    <span>태깅 결과 일괄 조회</span>
+  </div>
+  <div class="actions">
+    <a href="index.html" class="nav-link">← 태깅 도구</a>
+    <label class="file-btn" for="hwpx-files">HWPX 추가</label>
+    <input id="hwpx-files" type="file" accept=".hwpx,.HWPX" multiple>
+    <button class="secondary" id="clear-btn">초기화</button>
+    <button class="success" id="csv-btn">CSV 내보내기</button>
+  </div>
+</div>
+<div class="status">
+  <div class="dot" id="dot"></div>
+  <span id="status-text">파일을 추가하거나 드래그앤드롭하세요.</span>
+</div>
+
+<div class="main">
+  <div class="drop-area" id="drop-area">
+    <strong>HWPX 파일을 여기에 드래그앤드롭</strong>
+    <p>태깅 완료된 _tagged.hwpx 파일을 여러 개 올리면 태그 내용을 표로 정리합니다.</p>
+    <label class="file-btn" for="hwpx-files">파일 선택</label>
+  </div>
+  <div class="file-chips" id="file-chips"></div>
+  <div id="table-container"></div>
+</div>
+
+<script>
+/* ════════════════════════════════════════════
+   상태
+════════════════════════════════════════════ */
+const docs = [];      // [{ name, tags, error? }]
+let   colOrder = [];  // tagId 표시 순서
+
+/* ════════════════════════════════════════════
+   유틸
+════════════════════════════════════════════ */
+const $ = id => document.getElementById(id);
+
+function setStatus(text, tone) {
+  $('status-text').textContent = text;
+  $('dot').className = 'dot' + (tone === 'ready' ? ' ready' : tone === 'busy' ? ' busy' : '');
+}
+
+function escHtml(s) {
+  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function localName(el) {
+  return el.localName || el.nodeName.replace(/^.*:/,'');
+}
+
+/* ════════════════════════════════════════════
+   ZIP 리더 (읽기 전용 최소 구현)
+════════════════════════════════════════════ */
+function findEOCD(bytes) {
+  for (let i = bytes.length - 22; i >= 0; i--) {
+    if (bytes[i]===0x50&&bytes[i+1]===0x4b&&bytes[i+2]===0x05&&bytes[i+3]===0x06) return i;
+  }
+  const magic = Array.from(bytes.slice(0,8)).map(b=>b.toString(16).padStart(2,'0')).join(' ');
+  if (bytes[0]===0xD0&&bytes[1]===0xCF&&bytes[2]===0x11&&bytes[3]===0xE0)
+    throw new Error('구형 HWP 바이너리 형식입니다. HWPX로 재저장해 주세요.');
+  throw new Error(`ZIP 구조를 읽을 수 없습니다. (헤더: ${magic})`);
+}
+const u16 = (b,o) => b[o] | (b[o+1]<<8);
+const u32 = (b,o) => (b[o]|(b[o+1]<<8)|(b[o+2]<<16)|(b[o+3]<<24))>>>0;
+
+async function inflateRaw(bytes) {
+  const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+  return new Uint8Array(await new Response(stream).arrayBuffer());
+}
+
+async function unzip(file) {
+  const bytes   = new Uint8Array(await file.arrayBuffer());
+  const decoder = new TextDecoder('utf-8');
+  const eocd    = findEOCD(bytes);
+  const count   = u16(bytes, eocd+10);
+  const cdOff   = u32(bytes, eocd+16);
+  const entries = {};
+  let pos = cdOff;
+  for (let i = 0; i < count; i++) {
+    if (u32(bytes,pos)!==0x02014b50) throw new Error('ZIP 항목 정보를 읽을 수 없습니다.');
+    const method      = u16(bytes,pos+10);
+    const compSize    = u32(bytes,pos+20);
+    const nameLen     = u16(bytes,pos+28);
+    const extraLen    = u16(bytes,pos+30);
+    const commentLen  = u16(bytes,pos+32);
+    const localOff    = u32(bytes,pos+42);
+    const name        = decoder.decode(bytes.slice(pos+46, pos+46+nameLen));
+    const lnl = u16(bytes,localOff+26), lel = u16(bytes,localOff+28);
+    const dataStart   = localOff+30+lnl+lel;
+    const compressed  = bytes.slice(dataStart, dataStart+compSize);
+    let data;
+    if      (method===0) data = compressed;
+    else if (method===8) data = await inflateRaw(compressed);
+    else throw new Error(`지원하지 않는 압축 방식: ${method}`);
+    entries[name] = data;
+    pos += 46+nameLen+extraLen+commentLen;
+  }
+  return entries;
+}
+
+/* ════════════════════════════════════════════
+   태그 추출
+════════════════════════════════════════════ */
+function extractFromSection(xmlDoc) {
+  // { [tagId]: { label, parts: { [partIndex]: string } } }
+  const result = {};
+  const all    = Array.from(xmlDoc.getElementsByTagName('*'));
+
+  // 모든 fieldBegin(type=CLICK_HERE) 탐색
+  for (const fb of all) {
+    if (localName(fb) !== 'fieldBegin') continue;
+    if (fb.getAttribute('type') !== 'CLICK_HERE') continue;
+
+    // metaTag JSON 읽기
+    const mt = Array.from(fb.getElementsByTagName('*')).find(e => localName(e) === 'metaTag');
+    if (!mt) continue;
+    let meta;
+    try { meta = JSON.parse(mt.textContent); } catch { continue; }
+    if (meta.schema !== 'agenda-tagging/v1') continue;
+
+    const { tagId, label, partIndex } = meta;
+    const fieldId = fb.getAttribute('id') || fb.getAttribute('fieldid');
+
+    // 부모 문단(p) 찾기
+    let pNode = fb.parentElement;
+    while (pNode && localName(pNode) !== 'p') pNode = pNode.parentElement;
+    if (!pNode) continue;
+
+    // 문단 직속 run들 순서대로 읽어 fieldBegin~fieldEnd 사이 텍스트 수집
+    const runs = Array.from(pNode.childNodes).filter(c => c.nodeType===1 && localName(c)==='run');
+    let inField = false;
+    let text = '';
+    for (const run of runs) {
+      const runAll = Array.from(run.getElementsByTagName('*'));
+      const hasFB  = runAll.some(e => localName(e)==='fieldBegin'
+        && (e.getAttribute('id')===fieldId || e.getAttribute('fieldid')===fieldId));
+      const hasFE  = runAll.some(e => localName(e)==='fieldEnd'
+        && (e.getAttribute('beginIDRef')===fieldId || e.getAttribute('fieldid')===fieldId));
+
+      if (hasFB) { inField = true; continue; }
+      if (hasFE) break;
+      if (inField) {
+        text += runAll.filter(e=>localName(e)==='t').map(e=>e.textContent||'').join('');
+      }
+    }
+
+    if (!result[tagId]) result[tagId] = { label, parts: {} };
+    result[tagId].parts[partIndex] = text.trim();
+  }
+  return result;
+}
+
+async function processFile(file) {
+  const entries  = await unzip(file);
+  const decoder  = new TextDecoder('utf-8');
+  const parser   = new DOMParser();
+
+  const sections = Object.keys(entries)
+    .filter(n => /^Contents\/section\d+\.xml$/i.test(n) || /^BodyText\/section\d+\.xml$/i.test(n))
+    .sort((a,b) => a.localeCompare(b, undefined, {numeric:true}));
+
+  if (!sections.length) throw new Error('본문 section XML을 찾을 수 없습니다.');
+
+  const tags = {};
+  for (const name of sections) {
+    const xmlDoc = parser.parseFromString(decoder.decode(entries[name]), 'application/xml');
+    if (xmlDoc.querySelector('parsererror')) continue;
+    const found = extractFromSection(xmlDoc);
+    for (const [id, info] of Object.entries(found)) {
+      if (!tags[id]) tags[id] = { label: info.label, parts: {} };
+      Object.assign(tags[id].parts, info.parts);
+    }
+  }
+  return tags;
+}
+
+/* ════════════════════════════════════════════
+   열 순서 관리 (localStorage 표준 → 발견 순)
+════════════════════════════════════════════ */
+function getStandardOrder() {
+  try {
+    const s = localStorage.getItem('agenda-tagging-standard');
+    if (s) return (JSON.parse(s).tags || []).map(t => t.id);
+  } catch {}
+  return [];
+}
+
+function rebuildColOrder() {
+  const stdOrder = getStandardOrder();
+  const seen     = new Set();
+  const order    = [];
+  // 1) 표준 순서 우선
+  for (const id of stdOrder) {
+    if (docs.some(d => d.tags[id])) { order.push(id); seen.add(id); }
+  }
+  // 2) 표준에 없는 추가 태그 (발견 순)
+  for (const d of docs) {
+    for (const id of Object.keys(d.tags)) {
+      if (!seen.has(id)) { order.push(id); seen.add(id); }
+    }
+  }
+  colOrder = order;
+}
+
+/* ════════════════════════════════════════════
+   렌더링
+════════════════════════════════════════════ */
+function getCellText(doc, tagId) {
+  const info = doc.tags[tagId];
+  if (!info) return null;
+  const sorted = Object.keys(info.parts).map(Number).sort((a,b)=>a-b);
+  return sorted.map(k => info.parts[k]).join('\n');
+}
+
+function render() {
+  // 파일 칩
+  const chips = $('file-chips');
+  chips.innerHTML = docs.map((d, i) => {
+    const tagCount = Object.keys(d.tags).length;
+    const cls = d.error ? 'warn' : tagCount === 0 ? 'no-tag' : 'ok';
+    const meta = d.error ? `오류: ${d.error}`
+               : tagCount === 0 ? '태그 없음'
+               : `태그 ${tagCount}종`;
+    return `<div class="chip ${cls}">
+      <span class="chip-name" title="${escHtml(d.name)}">${escHtml(d.name)}</span>
+      <span class="chip-meta">(${escHtml(meta)})</span>
+      <span class="chip-remove" data-idx="${i}" title="제거">✕</span>
+    </div>`;
+  }).join('');
+  chips.querySelectorAll('.chip-remove').forEach(el =>
+    el.addEventListener('click', () => {
+      docs.splice(Number(el.dataset.idx), 1);
+      rebuildColOrder();
+      render();
+    })
+  );
+
+  // 표
+  const container = $('table-container');
+  if (!docs.length) { container.innerHTML = ''; return; }
+
+  const validDocs = docs.filter(d => !d.error);
+  if (!validDocs.length || !colOrder.length) {
+    container.innerHTML = `<div class="empty-state">
+      <strong>태그 데이터가 없습니다</strong>
+      태깅 도구에서 저장한 _tagged.hwpx 파일을 올려주세요.
+    </div>`;
+    return;
+  }
+
+  const headers = colOrder.map(id => {
+    const label = docs.find(d=>d.tags[id])?.tags[id]?.label || id;
+    return `<th title="${escHtml(id)}">${escHtml(label)}</th>`;
+  }).join('');
+
+  const rows = validDocs.map(d => {
+    const cells = colOrder.map(id => {
+      const text = getCellText(d, id);
+      return text != null
+        ? `<td class="tagged"><div class="cell-text">${escHtml(text)}</div></td>`
+        : `<td class="empty">—</td>`;
+    }).join('');
+    return `<tr><td class="filename">${escHtml(d.name)}</td>${cells}</tr>`;
+  }).join('');
+
+  container.innerHTML = `
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>파일명</th>${headers}</tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+}
+
+/* ════════════════════════════════════════════
+   파일 처리
+════════════════════════════════════════════ */
+async function addFiles(fileList) {
+  const files = Array.from(fileList).filter(f => /\.hwpx$/i.test(f.name));
+  if (!files.length) return;
+
+  setStatus(`처리 중...`, 'busy');
+  for (const file of files) {
+    if (docs.some(d => d.name === file.name)) continue;
+    try {
+      const tags = await processFile(file);
+      docs.push({ name: file.name, tags });
+    } catch (err) {
+      docs.push({ name: file.name, tags: {}, error: err.message });
+    }
+  }
+
+  rebuildColOrder();
+  const ok   = docs.filter(d=>!d.error).length;
+  const fail = docs.filter(d=> d.error).length;
+  setStatus(
+    fail ? `${ok}개 로드 완료, ${fail}개 실패` : `${ok}개 파일 로드 완료`,
+    fail ? '' : 'ready'
+  );
+  render();
+}
+
+/* ════════════════════════════════════════════
+   CSV 내보내기
+════════════════════════════════════════════ */
+function exportCsv() {
+  const validDocs = docs.filter(d => !d.error);
+  if (!validDocs.length || !colOrder.length) { setStatus('내보낼 데이터가 없습니다.'); return; }
+
+  const q = s => '"' + String(s ?? '').replace(/"/g, '""') + '"';
+  const labels = colOrder.map(id => docs.find(d=>d.tags[id])?.tags[id]?.label || id);
+  const header = ['파일명', ...labels].map(q).join(',');
+  const rows   = validDocs.map(d =>
+    [d.name, ...colOrder.map(id => getCellText(d, id) ?? '')].map(q).join(',')
+  );
+  const csv  = '﻿' + [header, ...rows].join('\r\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = 'agenda-summary.csv';
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+  setStatus('CSV 저장 완료', 'ready');
+}
+
+/* ════════════════════════════════════════════
+   이벤트 바인딩
+════════════════════════════════════════════ */
+$('hwpx-files').addEventListener('change', e => {
+  const files = e.target.files;
+  e.target.value = '';
+  addFiles(files);
+});
+
+$('clear-btn').addEventListener('click', () => {
+  docs.length = 0;
+  colOrder    = [];
+  render();
+  setStatus('초기화되었습니다.');
+});
+
+$('csv-btn').addEventListener('click', exportCsv);
+
+const dropArea = $('drop-area');
+dropArea.addEventListener('dragover',  e => { e.preventDefault(); dropArea.classList.add('over'); });
+dropArea.addEventListener('dragleave', ()  => dropArea.classList.remove('over'));
+dropArea.addEventListener('drop', e => {
+  e.preventDefault();
+  dropArea.classList.remove('over');
+  addFiles(e.dataTransfer.files);
+});
+
+// 페이지 전체 드롭 지원
+document.body.addEventListener('dragover', e => e.preventDefault());
+document.body.addEventListener('drop', e => {
+  e.preventDefault();
+  if (e.target.closest('#drop-area')) return; // drop-area 이벤트와 중복 방지
+  addFiles(e.dataTransfer.files);
+});
+</script>
+</body>
+</html>
