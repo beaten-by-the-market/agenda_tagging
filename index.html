@@ -2319,12 +2319,15 @@ function exportJson() {
     taggedAt: new Date().toISOString(),
     tags: Object.fromEntries(TAGS.map(tag => {
       const units = getUnits(tag.id);
-      return [tag.label, units.length === 0 ? null : units.map((u, i) => ({
-        partIndex: i + 1,
-        partCount: units.length,
-        type:      u.type,
-        text:      u.text,
-      }))];
+      return [tag.id, {
+        label: tag.label,
+        units: units.length === 0 ? null : units.map((u, i) => ({
+          partIndex: i + 1,
+          partCount: units.length,
+          type:      u.type,
+          text:      u.text,
+        })),
+      }];
     })),
   };
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json;charset=utf-8' });

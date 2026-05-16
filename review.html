@@ -74,6 +74,7 @@
     thead th { background:#fbfcfe; border-bottom:2px solid var(--line);
       padding:10px 14px; text-align:left; font-weight:800;
       position:sticky; top:0; z-index:1; white-space:nowrap; }
+    .th-id { font-size:10px; font-weight:500; color:var(--muted); margin-top:2px; }
     thead th:first-child { min-width:200px; position:sticky; left:0; z-index:2; }
     tbody td { padding:10px 14px; border-bottom:1px solid var(--soft); vertical-align:top; }
     tbody tr:last-child td { border-bottom:none; }
@@ -347,7 +348,7 @@ function render() {
 
   const headers = colOrder.map(id => {
     const label = docs.find(d=>d.tags[id])?.tags[id]?.label || id;
-    return `<th title="${escHtml(id)}">${escHtml(label)}</th>`;
+    return `<th>${escHtml(label)}<div class="th-id">${escHtml(id)}</div></th>`;
   }).join('');
 
   const rows = validDocs.map(d => {
